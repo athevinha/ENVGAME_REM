@@ -23,6 +23,8 @@ def data_progress(data_dir):
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
     zip_ref.extractall("uploads/")
 
+
+
 def traning(data_dir,img_height,img_width,batch_size):
    train_ds = tf.keras.utils.image_dataset_from_directory(
   data_dir,
