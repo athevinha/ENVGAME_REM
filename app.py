@@ -13,7 +13,7 @@ def index():
          uploaded_file.save(path_save)
          data_progress(path_save)
          os.remove(path_save)
-         traning(path_save.replace(".zip",""),240, 240, 64)
+         # traning(path_save.replace(".zip",""),240, 240, 64)
          
       return render_template("upload.html")
    if(request.method=="GET"):
@@ -25,13 +25,10 @@ def data_progress(data_dir):
 
 
 
-def traning(data_dir,img_height,img_width,batch_size):
-   train_ds = tf.keras.utils.image_dataset_from_directory(
-  data_dir,
-  seed=123,
-  image_size=(img_height, img_width),
-  batch_size=batch_size,
-  shuffle=False)
-
-
-    
+# def traning(data_dir,img_height,img_width,batch_size):
+#    train_ds = tf.keras.utils.image_dataset_from_directory(
+#   data_dir,
+#   seed=123,
+#   image_size=(img_height, img_width),
+#   batch_size=batch_size,
+#   shuffle=False)
