@@ -91,10 +91,9 @@ class create_model:
   # Resnet50
 
   def resnet50(self):
-    base_model = tf.keras.applications.resnet50.ResNet50()
+    base_model = tf.keras.applications.resnet50.ResNet50(input_shape=(self.img_height, self.img_width, 3))
     x = base_model.layers[-2].output
     output = Dense(units=self.num_classes, activation='softmax')(x)
-    base_model.summary()
     model = Model(inputs=base_model.input, outputs=output)
 
     for layer in model.layers[:-10]:
@@ -102,17 +101,25 @@ class create_model:
 
     model.summary()
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(self.train_ds,
+    H = model.fit(self.train_ds,
                 steps_per_epoch=len(self.train_ds),
                 validation_data=self.val_ds,
                 validation_steps=self.val_batches,
                 epochs=5,
     )
-    model.save("uploads/"+ name_model + "_resnet50.h5")
-    train_model = tf.keras.models.load_model("uploads/"+ name_model + "_resnet50.h5")
-    loss0, accuracy0 = train_model.evaluate(self.val_ds)
-    print("initial loss: {:.2f}".format(loss0))
-    print("initial accuracy: {:.2f}".format(accuracy0))
+    path_model = "uploads/"+ name_model + "_resnet50.h5"
+    model.save(path_model)
+    print(H.history)
+    traning_result = {
+      'log': H.history,
+      'model': path_model,
+      'name_model': self.name_model + "_resnet50.h5",
+      'type':'mobiletnet'
+    }
+    # train_model = tf.keras.models.load_model("uploads/"+ name_model + "_resnet50.h5")
+    # loss0, accuracy0 = train_model.evaluate(self.val_ds)
+    # print("initial loss: {:.2f}".format(loss0))
+    # print("initial accuracy: {:.2f}".format(accuracy0))
 
   # Mobilenetv2
 

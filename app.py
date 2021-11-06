@@ -20,7 +20,7 @@ def data_progress(data_dir):
     zip_ref.extractall("uploads/")
 
 def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_training):
-   # try:
+   try:
       model_created = train.create_model(
          data_dir = data_dir
          ,img_height =img_height
@@ -29,13 +29,13 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,name_model = name_model
          ,epoch = epoch
          ,model_training = model_training)
-      result = model_created.mobileNet()
+      result = model_created.resnet50()
       return result
-   # except:
-   #    print("====================")
-   #    print("Wrong directory structure")
-   #    print("====================")
-   #    return "<b style='color:red'>Wrong directory structure or System error </b>"
+   except:
+      print("====================")
+      print("Wrong directory structure")
+      print("====================")
+      return "<b style='color:red'>Wrong directory structure or System error </b>"
       
 
 
@@ -81,4 +81,4 @@ def streamed_response():
         yield '!'
     return app.response_class(stream_with_context(generate()))
 if __name__ == '__main__':
-   app.run(debug = True)
+   app.run(host='0.0.0.0',port=5000)
