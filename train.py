@@ -1,3 +1,4 @@
+from sys import path
 import tensorflow as tf
 from tensorflow.keras import layers
 import numpy as np
@@ -13,13 +14,19 @@ batch_size = 64
 name_model = "flowers"
 
 class create_model:
-  def __init__(self, data_dir, img_height,img_width, name_model = "user",batch_size = 64):
+  def __init__(self, data_dir, img_height,img_width,model_training,epoch = 5, name_model = "user",batch_size = 64):
+    img_height = int(img_height)
+    img_width = int(img_width)
+    batch_size = int(batch_size)
+    epoch = int(epoch)
     self.data_dir = data_dir
-    self.img_height = img_height
-    self.img_width = img_width
-    self.batch_size = batch_size
+    self.img_height = int(img_height)
+    self.img_width = int(img_width)
+    self.batch_size = int(batch_size)
     self.name_model = name_model
-    self.batch_size = batch_size
+    self.model_training = model_training
+    self.epoch = int(epoch)
+    print(self)
     self.train_ds = tf.keras.utils.image_dataset_from_directory(
                     data_dir,
                     seed=123,
@@ -47,8 +54,11 @@ class create_model:
       tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
       tf.keras.layers.experimental.preprocessing.RandomRotation(0.2),
     ])
+
+  #Mobilenet
+
   def mobileNet(self):
-    base_model = tf.keras.applications.mobilenet.MobileNet()
+    base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3))
     x = base_model.layers[-6].output
     output = Dense(units=self.num_classes, activation='softmax')(x)
     model = Model(inputs=base_model.input, outputs=output)
@@ -57,17 +67,28 @@ class create_model:
         layer.trainable = False
 
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-    model.fit(self.train_ds,
+    H = model.fit(self.train_ds,
                 steps_per_epoch=len(self.train_ds),
                 validation_data=self.val_ds,
                 validation_steps=self.val_batches,
-                epochs=5,
+                epochs=self.epoch,
     )
-    model.save("uploads/"+ name_model + "_mobilenet.h5")
-    train_model = tf.keras.models.load_model("uploads/"+ name_model + "_mobilenet.h5")
-    loss0, accuracy0 = train_model.evaluate(self.val_ds)
-    print("initial loss: {:.2f}".format(loss0))
-    print("initial accuracy: {:.2f}".format(accuracy0))
+    path_model = "models/"+ self.name_model + "_mobilenet.h5"
+    model.save(path_model)
+    # train_model = tf.keras.models.load_model(path_model)
+    # loss0, accuracy0 = train_model.evaluate(self.val_ds)
+    # print("initial loss: {:.2f}".format(loss0))
+    # print("initial accuracy: {:.2f}".format(accuracy0))
+    print(H.history)
+    traning_result = {
+      'log': H.history,
+      'model': path_model,
+      'name_model': self.name_model + "_mobilenet.h5",
+      'type':'mobiletnet'
+    }
+    return traning_result
+
+  # Resnet50
 
   def resnet50(self):
     base_model = tf.keras.applications.resnet50.ResNet50()
@@ -93,9 +114,32 @@ class create_model:
     print("initial loss: {:.2f}".format(loss0))
     print("initial accuracy: {:.2f}".format(accuracy0))
 
-    
+  # Mobilenetv2
 
-  
+  def mobileNetV2(self):
+    base_model = tf.keras.applications.MobileNetV2()
+    model = tf.keras.Sequential([base_model,
+                    tf.keras.layers.GlobalAveragePooling2D(), 
+                    Dense(5, activation='softmax')
+                   ])
+    model.summary()
+    for layer in model.layers[:100]:
+        layer.trainable = False
+
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.fit(self.train_ds,
+                steps_per_epoch=len(self.train_ds),
+                validation_data=self.val_ds,
+                validation_steps=self.val_batches,
+                epochs=5,
+    )
+    model.save("uploads/"+ name_model + "_mobilenet.h5")
+    train_model = tf.keras.models.load_model("uploads/"+ name_model + "_mobilenet.h5")
+    loss0, accuracy0 = train_model.evaluate(self.val_ds)
+    print(" initial loss: {:.2f}".format(loss0))
+    print("initial accuracy: {:.2f}".format(accuracy0))
+
+    
 
 # train_ds = tf.keras.utils.image_dataset_from_directory(
 # data_dir,
