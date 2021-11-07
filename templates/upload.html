@@ -229,19 +229,22 @@ The system automatically creates a deep learning model of trees using a dataset 
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
+    if((bytes / (1024 ** i)).toFixed(1) >= 150) {
+      alert("Your dataset is over 150MB !")
+      return "<b style={color:'red'}>Your dataset is over 100MB !</b>"
+    }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
   }
 
   $(document).ready(function () {
     $('.hide').hide()
     $("#dataset_input").change(function (e) {
+      $('.loading').show(300)
       var file = e.target.files[0];
       console.log(bytesToSize(file.size))
       let file_info_export = `File name: <b>${file.name}</b> <br/> Size: <b>${bytesToSize(file.size)}</b> <br/> Type: <b>${file.type}</b>`
       $('.file_info').html(file_info_export)
       $('.file_info').show(300)
-
-      
       var formData = new FormData();
       formData.append("file", file);
       var QueryOBJ = {
@@ -253,8 +256,8 @@ The system automatically creates a deep learning model of trees using a dataset 
         model_training: $("#model_training").val(),
       }
       formData.append('data', JSON.stringify(QueryOBJ));
-      $('.loading').show(300)
-      axios.post('http://127.0.0.1:5000/', formData, {
+
+      axios.post('https://create-model.envgame.online/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

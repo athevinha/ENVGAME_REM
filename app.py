@@ -73,12 +73,12 @@ def download(name_model):
    return send_file("models/"+name_model, as_attachment=True)
 
 
-@app.route('/stream')
-def streamed_response():
-    def generate():
-        yield 'Hello '
-        yield request.args['name']
-        yield '!'
-    return app.response_class(stream_with_context(generate()))
+# @app.route('/stream')
+# def streamed_response():
+#     def generate():
+#         yield 'Hello '
+#         yield request.args['name']
+#         yield '!'
+#     return app.response_class(stream_with_context(generate()))
 if __name__ == '__main__':
    app.run(host='0.0.0.0',port=5000)
