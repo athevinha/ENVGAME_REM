@@ -9,6 +9,9 @@ import random
 import zipfile
 app = Flask(__name__)
 import zipfile
+import logging
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 ALLOWED_EXTENSIONS = {'zip'}
 def allowed_file(filename):

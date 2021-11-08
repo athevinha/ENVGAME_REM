@@ -55,11 +55,11 @@
             <input name="file" type="file" id="dataset_input">
           </div>
           <hr />
-          <i style="color: white">
+          <!-- <i style="color: white">
             "To diagnose plant diseases most accurately, give
             photos of a symptomatic plant leaf (not mixed with anything
             what else)"
-          </i>
+          </i> -->
           <hr />
 
           <div class="loading" style='height: 300px;
@@ -166,21 +166,6 @@
   //   'May',
   //   'June',
   // ];
-  function previewFile() {
-    var file = new File(["hi"], "hi.txt", {
-      type: "text/plain",
-    });
-    const reader = new FileReader();
-
-    reader.addEventListener("load", () => {
-      // this will then display a text file
-     console.log(reader.result);
-    }, false);
-
-    if (file) {
-      reader.readAsText("hi.txt");
-    }
-  }
 
   function processing_log(data) {
     data = data.replaceAll('"GET /static/styles/nohup.out HTTP/1.0" 200 -', '<br/>')
@@ -297,9 +282,9 @@
       }).then(rs => {
         response = JSON.parse(rs.data)
         console.log(response)
-        $('.loading').hide(300)
-        $('.load_log').html(rs.data)
-        $('.load_log').show(300)
+        // $('.loading').hide(300)
+        console.log(rs.data)
+        // $('.load_log').show(300)
         // $('.result').show(300)
         if (response.name_model) {
           $('.result').show(300)
