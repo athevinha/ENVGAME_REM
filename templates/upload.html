@@ -189,15 +189,15 @@
 
   }
 
-  // setInterval(() => {
-  //   $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
-  //     $(".loading").html(processing_log(data))
-  //     console.log(data)
-  //     $('.loading').animate({
-  //       scrollTop: $('.loading').get(0).scrollHeight
-  //     }, 200);
-  //   }, "text");
-  // }, 1000);
+  setInterval(() => {
+    $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
+      $(".loading").html(processing_log(data))
+      console.log(data)
+      $('.loading').animate({
+        scrollTop: $('.loading').get(0).scrollHeight
+      }, 200);
+    }, "text");
+  }, 1000);
 
   function draw_graph(data) {
     data = data.log
