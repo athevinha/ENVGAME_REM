@@ -29,7 +29,7 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,name_model = name_model
          ,epoch = epoch
          ,model_training = model_training)
-      result = model_created.resnet50()
+      result = model_created.mobileNet()
       return result
    # except:
       # print("====================")
