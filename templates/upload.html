@@ -42,9 +42,9 @@
                 </div>
               </div>
               <div class="col-sm-6 border_none">
-                <hr/>
-                <div class="file_info" style="color:tomato; " >
-The system automatically creates a deep learning model of trees using a dataset provided by the user.
+                <hr />
+                <div class="file_info" style="color:tomato; ">
+                  The system automatically creates a deep learning model of trees using a dataset provided by the user.
                 </div>
               </div>
             </div>
@@ -63,7 +63,7 @@ The system automatically creates a deep learning model of trees using a dataset 
           </i>
           <hr />
 
-         
+
           <div class="loading hide">
             <i class="fa fa-cog fa-spin" style="font-size: 80px;"></i>
           </div>
@@ -165,7 +165,12 @@ The system automatically creates a deep learning model of trees using a dataset 
   //   'May',
   //   'June',
   // ];
-
+  setInterval(() => {
+    $.get("{{ url_for('static',filename='styles/nohup.out') }}", function(data) {
+        $(".loading").html(data)
+        console.log(data)
+    }, "text");
+  }, 1000);
 
   function draw_graph(data) {
     data = data.log
@@ -229,10 +234,10 @@ The system automatically creates a deep learning model of trees using a dataset 
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
-    if((bytes / (1024 ** i)).toFixed(1) >= 150) {
-      alert("Your dataset is over 150MB !")
-      return "<b style={color:'red'}>Your dataset is over 100MB !</b>"
-    }
+    // if((bytes / (1024 ** i)).toFixed(1) >= 150) {
+    //   alert("Your dataset is over 150MB !")
+    //   return "<b style={color:'red'}>Your dataset is over 100MB !</b>"
+    // }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
   }
 
@@ -242,7 +247,8 @@ The system automatically creates a deep learning model of trees using a dataset 
       $('.loading').show(300)
       var file = e.target.files[0];
       console.log(bytesToSize(file.size))
-      let file_info_export = `File name: <b>${file.name}</b> <br/> Size: <b>${bytesToSize(file.size)}</b> <br/> Type: <b>${file.type}</b>`
+      let file_info_export =
+        `File name: <b>${file.name}</b> <br/> Size: <b>${bytesToSize(file.size)}</b> <br/> Type: <b>${file.type}</b>`
       $('.file_info').html(file_info_export)
       $('.file_info').show(300)
       var formData = new FormData();
@@ -257,7 +263,7 @@ The system automatically creates a deep learning model of trees using a dataset 
       }
       formData.append('data', JSON.stringify(QueryOBJ));
 
-      axios.post('https://create-model.envgame.online/', formData, {
+      axios.post('http://127.0.0.1:5000/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -273,7 +279,7 @@ The system automatically creates a deep learning model of trees using a dataset 
           $('#model_downloader').attr("href", "/download/" + response.name_model)
           draw_graph(response)
         }
-        
+
       })
 
     });
