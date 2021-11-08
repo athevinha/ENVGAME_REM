@@ -166,21 +166,38 @@
   //   'May',
   //   'June',
   // ];
+  function previewFile() {
+    var file = new File(["hi"], "hi.txt", {
+      type: "text/plain",
+    });
+    const reader = new FileReader();
+
+    reader.addEventListener("load", () => {
+      // this will then display a text file
+     console.log(reader.result);
+    }, false);
+
+    if (file) {
+      reader.readAsText("hi.txt");
+    }
+  }
+
   function processing_log(data) {
     data = data.replaceAll('"GET /static/styles/nohup.out HTTP/1.0" 200 -', '<br/>')
     data = data.replaceAll('127.0.0.1 - -', '')
     return data
 
   }
-  setInterval(() => {
-    $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
-      $(".loading").html(processing_log(data))
-      console.log(data)
-      $('.loading').animate({
-        scrollTop: $('.loading').get(0).scrollHeight
-      }, 200);
-    }, "text");
-  }, 1000);
+
+  // setInterval(() => {
+  //   $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
+  //     $(".loading").html(processing_log(data))
+  //     console.log(data)
+  //     $('.loading').animate({
+  //       scrollTop: $('.loading').get(0).scrollHeight
+  //     }, 200);
+  //   }, "text");
+  // }, 1000);
 
   function draw_graph(data) {
     data = data.log
@@ -244,10 +261,10 @@
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
-    // if((bytes / (1024 ** i)).toFixed(1) >= 150) {
-    //   alert("Your dataset is over 150MB !")
-    //   return "<b style={color:'red'}>Your dataset is over 100MB !</b>"
-    // }
+    if((bytes / (1024 ** i)).toFixed(1) >= 50) {
+      alert("Your dataset is over 50MB !")
+      return "<b style={color:'red'}>Your dataset is over 50MB !</b>"
+    }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
   }
 
@@ -273,7 +290,7 @@
       }
       formData.append('data', JSON.stringify(QueryOBJ));
 
-      axios.post('https://create-model.envgame.online/', formData, {
+      axios.post('http://127.0.0.1:5000/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
