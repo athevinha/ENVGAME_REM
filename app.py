@@ -45,27 +45,30 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
 @app.route("/",methods = ["GET","POST"])
 def index():
    if(request.method=="POST"):
-      data= request.form.get("data")
-      data = json.loads(data)
-      uploaded_file = request.files['file']
-      if uploaded_file and allowed_file(uploaded_file.filename):
-         path_save = "uploads/" + uploaded_file.filename
-         uploaded_file.save(path_save)
-         data_progress(path_save)
-         os.remove(path_save)
+      try:
+         data= request.form.get("data")
+         data = json.loads(data)
+         uploaded_file = request.files['file']
+         if uploaded_file and allowed_file(uploaded_file.filename):
+            path_save = "uploads/" + uploaded_file.filename
+            uploaded_file.save(path_save)
+            data_progress(path_save)
+            os.remove(path_save)
 
-         result = traning(
-           data_dir= path_save.replace(".zip","")
-            ,img_height = data['img_height']
-            ,img_width= data['img_width']
-            ,batch_size= data['batch_size']
-            ,epoch = data['epoch']
-            ,name_model= data['name_model']
-            ,model_training = data['model_training']
-            )
+            result = traning(
+            data_dir= path_save.replace(".zip","")
+               ,img_height = data['img_height']
+               ,img_width= data['img_width']
+               ,batch_size= data['batch_size']
+               ,epoch = data['epoch']
+               ,name_model= data['name_model']
+               ,model_training = data['model_training']
+               )
 
-      # return render_template("loading.html", jsonify(json.dumps(result)))
-      return jsonify(json.dumps(result))
+         # return render_template("loading.html", jsonify(json.dumps(result)))
+         return jsonify(json.dumps(result))
+      except:
+         return render_template("upload.html")
    if(request.method=="GET"):
       return render_template("upload.html")
 
