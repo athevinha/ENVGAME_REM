@@ -62,7 +62,7 @@
           </i>
           <hr />
 
-          <div class="loading hide">
+          <div class="loading">
           </div>
           <div class="load_log hide">
           </div>
@@ -169,7 +169,7 @@
 
   }
   setInterval(() => {
-    $.get("{{ url_for('static',filename='styles/nohup.out') }}", function (data) {
+    $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
       $(".loading").html(processing_log(data))
       console.log(data)
       $('.loading').animate({
