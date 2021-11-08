@@ -64,8 +64,8 @@
           <hr />
 
 
-          <div class="loading hide">
-            <i class="fa fa-cog fa-spin" style="font-size: 80px;"></i>
+          <div class="loading">
+            <!-- <i class="fa fa-cog fa-spin" style="font-size: 80px;"></i> -->
           </div>
           <div class="load_log hide">
           </div>
@@ -165,10 +165,19 @@
   //   'May',
   //   'June',
   // ];
+  function processing_log(data) {
+    data = data.replaceAll('"GET /static/styles/nohup.out HTTP/1.0" 200 -', '<br/>')
+    data = data.replaceAll('127.0.0.1 - -', '')
+    return data
+
+  }
   setInterval(() => {
-    $.get("{{ url_for('static',filename='styles/nohup.out') }}", function(data) {
-        $(".loading").html(data)
-        console.log(data)
+    $.get("{{ url_for('static',filename='styles/nohup.out') }}", function (data) {
+      $(".loading").html(processing_log(data))
+      console.log(data)
+      $('.loading').animate({
+        scrollTop: $('.loading').get(0).scrollHeight
+      }, 200);
     }, "text");
   }, 1000);
 

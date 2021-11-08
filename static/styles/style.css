@@ -197,3 +197,10 @@
   }
   .container{
   }
+  .loading{
+    height: 300px;
+    overflow:overlay;
+    border:1px violet solid;
+    color:lime;
+    border-radius: 20px;
+  }
