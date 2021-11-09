@@ -64,7 +64,7 @@ def index():
             uploaded_file.save(path_save)
             data_progress(path_save)
             os.remove(path_save)
-            result = q.enqueue(traning(
+            result = traning(
             data_dir= path_save.replace(".zip","")
                ,img_height = data['img_height']
                ,img_width= data['img_width']
@@ -72,7 +72,7 @@ def index():
                ,epoch = data['epoch']
                ,name_model= data['name_model']
                ,model_training = data['model_training']
-               ))
+               )
 
          # return render_template("loading.html", jsonify(json.dumps(result)))
          return jsonify(json.dumps(result))
