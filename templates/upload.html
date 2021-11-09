@@ -14,10 +14,13 @@
 </head>
 
 <body>
+  <div class="models hide"
+    style="overflow: overlay;position:fixed;z-index: 30;height: 98vh;top:1vh; width: 20vw; background-color: rgb(0, 17, 51); left: 80vw; border-radius: 20px;border: 1px solid;">
+    Loading...
+  </div>
   <form method="POST" enctype="multipart/form-data" id="form_upload">
     <div class="container" style="max-width: 90vw;">
       <div class="row">
-
         <div class="col-sm-12 text_center">
           <h5 style="color: white">CREATE LEAF DAMAGE MODEL</h5>
         </div>
@@ -62,7 +65,7 @@
           </i> -->
           <hr />
 
-          <div class="loading" style='height: 300px;
+          <div class="loading hide" style='height: 300px;
           overflow:overlay;
           border:1px violet solid;
           color:lime;
@@ -141,6 +144,10 @@
             <option value="mobiletnet" selected>Mobilet Net</option>
           </select>
           <hr />
+          <span class="text_model">Download everyone's model:</span>
+          <hr />
+          <p class="btn btn-outline-primary toogle_models btn-block btn-large" style="cursor:pointer; font-size: 25px;">LIST TRANING MODEL</p>
+          <hr />
         </div>
       </div>
     </div>
@@ -177,12 +184,11 @@
   setInterval(() => {
     $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
       $(".loading").html(processing_log(data))
-      console.log(data)
       $('.loading').animate({
         scrollTop: $('.loading').get(0).scrollHeight
       }, 200);
     }, "text");
-  }, 1000);
+  }, 2000);
 
   function draw_graph(data) {
     data = data.log
@@ -241,18 +247,35 @@
     );
   }
 
+  function get_models() {
+    axios.get('/models')
+      .then(function (response) {
+        let models = response.data
+        models = models.replaceAll("[", "")
+        models = models.replaceAll("]", "")
+        models = models.replaceAll("'", "")
+        models = models.replaceAll(" ", "")
+        models = models.split(",")
+        $('.models').html(models.map((model, id) => {
+          return `<hr /><a href=${"/download/" + model} class="btn btn-outline-info btn-block btn-large" id="submit_create_model"
+              style="font-size: 20px;">${model} <i class="fa fa-cloud-download-alt"></i></a>`
+        }))
+      })
+  }
+
+  get_models()
+
   function bytesToSize(bytes) {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
-    if((bytes / (1024 ** i)).toFixed(1) >= 50) {
+    if ((bytes / (1024 ** i)).toFixed(1) >= 50) {
       alert("Your dataset is over 50MB !")
       return "<b style={color:'red'}>Your dataset is over 50MB !</b>"
     }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
   }
-
   $(document).ready(function () {
     $('.hide').hide()
     $("#dataset_input").change(function (e) {
@@ -275,7 +298,7 @@
       }
       formData.append('data', JSON.stringify(QueryOBJ));
 
-      axios.post('https://create-model.envgame.online/', formData, {
+      axios.post('http://127.0.0.1:5000/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -295,6 +318,10 @@
       })
 
     });
+    $('.toogle_models').click(
+      function () {
+        $('.models').toggle(200)
+      },)
   });
 </script>
 

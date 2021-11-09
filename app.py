@@ -9,11 +9,21 @@ import random
 import zipfile
 app = Flask(__name__)
 import zipfile
+import redis
+from rq import Queue
 import logging
+
+# ____ init ____
+
+r = redis.Redis()
+q = Queue(connection = r)
+
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-
 ALLOWED_EXTENSIONS = {'zip'}
+
+# ____ processing function ____
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -40,7 +50,7 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
       print("====================")
       return "<b style='color:red'>Wrong directory structure or System error </b>"
       
-
+# ____ router flask ____
 
 @app.route("/",methods = ["GET","POST"])
 def index():
@@ -54,8 +64,7 @@ def index():
             uploaded_file.save(path_save)
             data_progress(path_save)
             os.remove(path_save)
-
-            result = traning(
+            result = q.enqueue(traning(
             data_dir= path_save.replace(".zip","")
                ,img_height = data['img_height']
                ,img_width= data['img_width']
@@ -63,7 +72,7 @@ def index():
                ,epoch = data['epoch']
                ,name_model= data['name_model']
                ,model_training = data['model_training']
-               )
+               ))
 
          # return render_template("loading.html", jsonify(json.dumps(result)))
          return jsonify(json.dumps(result))
@@ -72,19 +81,17 @@ def index():
    if(request.method=="GET"):
       return render_template("upload.html")
 
+@app.route('/models')
+def models():
+   files = os.listdir('models')
+   return str(files)
    
 @app.route('/download/<name_model>', methods=['GET', 'POST'])
 def download(name_model):
    print(name_model)
    return send_file("models/"+name_model, as_attachment=True)
 
+# ____ system config ____
 
-# @app.route('/stream')
-# def streamed_response():
-#     def generate():
-#         yield 'Hello '
-#         yield request.args['name']
-#         yield '!'
-#     return app.response_class(stream_with_context(generate()))
 if __name__ == '__main__':
-   app.run()
+   app.run(threaded=False)
