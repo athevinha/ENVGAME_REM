@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>File Upload</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta2/css/all.min.css"
+        integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<style>
+    .in4_model{
+        color: coral;
+        font-family: emoji;
+    }
+</style>
+<body>
+    <div class="container" style='max-width:90vw'>
+        <hr />
+        <h1 style='font-family: emoji'>Your Model information</h1>
+        <div class="row in4_model">
+            <hr />
+            <div class="col-sm-6">
+                Name model: <p class="name_model" style="color:coral;font-size: 25px;"></p>
+                Type: <p class="type_model" style="color:coral;font-size: 25px;"></p>
+                <a href="" id="model_downloader" class="btn btn-outline-info btn-block btn-large"
+                id="submit_create_model" style="font-size: 20px;">Download model <i
+                    class="fa fa-cloud-download-alt"></i></a>
+                    <hr/>
+            <a target="_blank" href="https://colab.research.google.com/drive/1B-xnPOV87MIwvGWLPggJNTLLfxUw1OMA"
+                class="btn btn-outline-primary btn-block btn-large" style="font-size: 20px;">Evaluate model <i
+                    class="fa fa-percent"></i></a>
+            </div>
+            <div class="col-sm-6">
+                Accuracy: <p class="accuracy_model" style="color:coral;font-size: 25px;"></p>
+                Validation accuracy: <p class="val_accuracy_model" style="color:coral;font-size: 25px;"></p>
+                Loss: <p class="loss_model" style="color:coral;font-size: 25px;"></p>
+                Validation loss: <p class="val_loss_model" style="color:coral;font-size: 25px;"></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <canvas id="accuracy"></canvas>
+            </div>
+            <div class="col-sm-6">
+                <canvas id="loss"></canvas>
+            </div>
+        </div>
+      
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"
+    integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    $(document).ready(function () {
+        let history = JSON.parse('{{history | tojson}}')
+        draw_graph(history.log)
+        $('#model_downloader').attr("href", "/download/" + history.name_model)
+        $('.name_model').html(history.name_model)
+        $('.type_model').html(history.type)
+        $('.accuracy_model').html(history.log.accuracy[history.log.accuracy.length - 1])
+        $('.val_accuracy_model').html(history.log.val_accuracy[history.log.val_accuracy.length - 1])
+        $('.loss_model').html(history.log.loss[history.log.loss.length - 1])
+        $('.val_loss_model').html(history.log.val_loss[history.log.val_loss.length - 1])
+
+    })
+
+
+    function draw_graph(data) {
+        console.log(data)
+        const accuracy = {
+            labels: [...Array(data.accuracy.length).keys()],
+            datasets: [{
+                    label: 'accuracy',
+                    backgroundColor: 'aqua',
+                    borderColor: 'aqua',
+                    data: data.accuracy,
+                },
+                {
+                    label: 'validation accuracy',
+                    backgroundColor: 'violet',
+                    borderColor: 'violet',
+                    data: data.val_accuracy,
+                }
+            ]
+        };
+        const config_accuracy = {
+            type: 'line',
+            data: accuracy,
+            options: {}
+        };
+        var accuracy_chart = new Chart(
+            document.getElementById('accuracy'),
+            config_accuracy
+        );
+
+
+        const loss = {
+            labels: [...Array(data.loss.length).keys()],
+            datasets: [{
+                    label: 'loss',
+                    backgroundColor: 'aqua',
+                    borderColor: 'aqua',
+                    data: data.loss,
+                },
+                {
+                    label: 'validation loss',
+                    backgroundColor: 'violet',
+                    borderColor: 'violet',
+                    data: data.val_loss,
+                }
+            ]
+        };
+        const config_loss = {
+            type: 'line',
+            data: loss,
+            options: {}
+        };
+        var loss_chart = new Chart(
+            document.getElementById('loss'),
+            config_loss
+        );
+    }
+</script>
+
+</html>

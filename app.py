@@ -7,21 +7,18 @@ import json
 import tensorflow as tf
 import random
 import zipfile
-app = Flask(__name__)
 import zipfile
-import redis
-from rq import Queue
 import logging
+import threading, queue,time
+
+
 
 # ____ init ____
-
-r = redis.Redis()
-q = Queue(connection = r)
-
+q = queue.Queue()
+app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
-
 # ____ processing function ____
 
 def allowed_file(filename):
@@ -31,7 +28,6 @@ def allowed_file(filename):
 def data_progress(data_dir):
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
     zip_ref.extractall("uploads/")
-
 def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_training):
    try:
       model_created = train.create_model(
@@ -52,6 +48,32 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
       
 # ____ router flask ____
 
+def worker():
+   global result_gl
+   while True:
+         data = q.get()
+         print("================ SYSTEM LOG ========================")
+         print(f'Working on {data["data_dir"]}')
+         print("====================================================")
+         result_gl = traning(
+            data_dir= data['data_dir']
+               ,img_height = data['img_height']
+               ,img_width= data['img_width']
+               ,batch_size= data['batch_size']
+               ,epoch = data['epoch']
+               ,name_model= data['name_model']
+               ,model_training = data['model_training']
+            )
+         print("================ SYSTEM LOG ========================")
+         print(f'Finished {data["data_dir"]}')
+         print("====================================================")
+         q.task_done()
+
+# turn-on the worker thread
+threading.Thread(target=worker, daemon=True).start()
+print('All task requests sent\n', end='')
+# block until all tasks are done
+
 @app.route("/",methods = ["GET","POST"])
 def index():
    if(request.method=="POST"):
@@ -64,18 +86,29 @@ def index():
             uploaded_file.save(path_save)
             data_progress(path_save)
             os.remove(path_save)
-            result = traning(
-            data_dir= path_save.replace(".zip","")
-               ,img_height = data['img_height']
-               ,img_width= data['img_width']
-               ,batch_size= data['batch_size']
-               ,epoch = data['epoch']
-               ,name_model= data['name_model']
-               ,model_training = data['model_training']
-               )
-
-         # return render_template("loading.html", jsonify(json.dumps(result)))
-         return jsonify(json.dumps(result))
+            
+            
+            task_info = {
+                 'data_dir': path_save.replace(".zip","")
+               ,'img_height' : data['img_height']
+               ,'img_width': data['img_width']
+               ,'batch_size': data['batch_size']
+               ,'epoch' : data['epoch']
+               ,'name_model': data['name_model']
+               ,'model_training' : data['model_training']
+            }
+            q.put(task_info)
+            # result = traning(
+            # data_dir= path_save.replace(".zip","")
+            #    ,img_height = data['img_height']
+            #    ,img_width= data['img_width']
+            #    ,batch_size= data['batch_size']
+            #    ,epoch = data['epoch']
+            #    ,name_model= data['name_model'] 
+            #    ,model_training = data['model_training']
+            #    )
+         # return redirect("historys/", code=302)
+         return render_template("loading.html", jsonify(json.dumps(result_gl)))
       except:
          return render_template("upload.html")
    if(request.method=="GET"):
@@ -85,13 +118,42 @@ def index():
 def models():
    files = os.listdir('models')
    return str(files)
-   
+def get_val():
+   try:
+      return result_gl
+   except:
+      return ''
+
+@app.route('/static/log/nohup.out')
+def nohup():
+   with open('static/log/nohup.out') as f:
+      lines = f.read() 
+      return json.dumps({
+         "nohup": lines,
+         "result": get_val()
+         })
+
 @app.route('/download/<name_model>', methods=['GET', 'POST'])
 def download(name_model):
    print(name_model)
    return send_file("models/"+name_model, as_attachment=True)
 
+@app.route('/historys/<history_model>', methods=['GET', 'POST'])
+def historys(history_model):
+   try:
+      with open('historys/'+ history_model + ".txt") as f:
+         lines = f.read()
+         lines = lines.replace("'", '"')
+         rs = json.loads(lines)
+         return render_template("history.html", history = rs)
+   except:
+      return render_template("error.html", name = history_model) 
+   
+
+q.join()
+print('All work completed')
+
 # ____ system config ____
 
 if __name__ == '__main__':
-   app.run(threaded=False)
+   app.run()

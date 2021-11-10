@@ -146,7 +146,8 @@
           <hr />
           <span class="text_model">Download everyone's model:</span>
           <hr />
-          <p class="btn btn-outline-primary toogle_models btn-block btn-large" style="cursor:pointer; font-size: 25px;">LIST TRANING MODEL</p>
+          <p class="btn btn-outline-primary toogle_models btn-block btn-large" style="cursor:pointer; font-size: 25px;">
+            LIST TRANING MODEL</p>
           <hr />
         </div>
       </div>
@@ -156,6 +157,8 @@
   </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <!-- integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+  crossorigin="anonymous"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"
   integrity="sha512-u9akINsQsAkG9xjc1cnGF4zw5TFDwkxuc9vUp5dltDWYCSmyd0meygbvgXrlc/z7/o4a19Fb5V0OUE58J7dcyw=="
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -163,16 +166,7 @@
 <script>
   //  let  dict = '{"log": {"loss": [1.6513383388519287], "accuracy": [0.4078007936477661], "val_loss": [1.7214546203613281], "val_accuracy": [0.4404181241989136]}, "model": "models/q\u01b0ev_mobilenet.h5", "name_model": "q\u01b0ev_mobilenet.h5", "type": "mobiletnet"}'
   //  let dict2 = "{'loss': [1.698645830154419, 0.9830909967422485, 0.7008122801780701, 0.5004916787147522, 0.3600955605506897], 'accuracy': [0.4071043133735657, 0.6409541964530945, 0.7797318696975708, 0.885948121547699, 0.9399268627166748], 'val_loss': [2.1421902179718018, 1.5581915378570557, 1.461743712425232, 1.316980004310608, 1.310359001159668], 'val_accuracy': [0.3846689760684967, 0.4648083746433258, 0.504529595375061, 0.5456445813179016, 0.5491289496421814]}"
-
-  // console.log(JSON.parse(dict))
-  //   const labels = [
-  //   'January',
-  //   'February',
-  //   'March',
-  //   'April',
-  //   'May',
-  //   'June',
-  // ];
+  let SERVER_ADS = 'http://127.0.0.1:5000/'
 
   function processing_log(data) {
     data = data.replaceAll('"GET /static/styles/nohup.out HTTP/1.0" 200 -', '<br/>')
@@ -182,8 +176,24 @@
   }
 
   setInterval(() => {
+    console.log("{{ url_for('static',filename='log/nohup.out') }}")
     $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
-      $(".loading").html(processing_log(data))
+      // data = data.replaceAll("'",'"')
+      data = JSON.parse(data)
+      console.log(data)
+      if(data.result != ''){
+        response = data.result
+        console.log(response)
+        $('.loading').hide(300)
+        $('.load_log').show(300)
+        $('.result').show(300)
+        if (response.name_model) {
+          $('.result').show(300)
+          $('#model_downloader').attr("href", "/download/" + response.name_model)
+          draw_graph(response)
+        }
+      }
+      $(".loading").html(processing_log(data.nohup))
       $('.loading').animate({
         scrollTop: $('.loading').get(0).scrollHeight
       }, 200);
@@ -255,9 +265,10 @@
         models = models.replaceAll("]", "")
         models = models.replaceAll("'", "")
         models = models.replaceAll(" ", "")
+        models = models.replaceAll(".h5", "")
         models = models.split(",")
         $('.models').html(models.map((model, id) => {
-          return `<hr /><a href=${"/download/" + model} class="btn btn-outline-info btn-block btn-large" id="submit_create_model"
+          return `<hr /><a href=${"/historys/" + model} target="_blank" class="btn btn-outline-info btn-block btn-large" id="submit_create_model"
               style="font-size: 20px;">${model} <i class="fa fa-cloud-download-alt"></i></a>`
         }))
       })
@@ -298,22 +309,22 @@
       }
       formData.append('data', JSON.stringify(QueryOBJ));
 
-      axios.post('https://create-model.envgame.online/', formData, {
+      axios.post(SERVER_ADS, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }).then(rs => {
-        response = JSON.parse(rs.data)
-        console.log(response)
-        // $('.loading').hide(300)
-        console.log(rs.data)
-        // $('.load_log').show(300)
-        // $('.result').show(300)
-        if (response.name_model) {
-          $('.result').show(300)
-          $('#model_downloader').attr("href", "/download/" + response.name_model)
-          draw_graph(response)
-        }
+        // response = JSON.parse(rs.data)
+        // console.log(response)
+        // // $('.loading').hide(300)
+        // console.log(rs.data)
+        // // $('.load_log').show(300)
+        // // $('.result').show(300)
+        // if (response.name_model) {
+        //   $('.result').show(300)
+        //   $('#model_downloader').attr("href", "/download/" + response.name_model)
+        //   draw_graph(response)
+        // }
 
       })
 
@@ -321,7 +332,7 @@
     $('.toogle_models').click(
       function () {
         $('.models').toggle(200)
-      },)
+      }, )
   });
 </script>
 

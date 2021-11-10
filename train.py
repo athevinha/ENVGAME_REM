@@ -67,7 +67,7 @@ class create_model:
     output = Dense(units=self.num_classes, activation='softmax')(x)
     model = Model(inputs=base_model.input, outputs=output)
     model.summary()
-    for layer in model.layers[:-23]:
+    for layer in model.layers[:-1]: # -23
         layer.trainable = False
 
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -79,17 +79,15 @@ class create_model:
     )
     path_model = "models/"+ self.name_model + "_mobilenet.h5"
     model.save(path_model)
-    # train_model = tf.keras.models.load_model(path_model)
-    # loss0, accuracy0 = train_model.evaluate(self.val_ds)
-    # print("initial loss: {:.2f}".format(loss0))
-    # print("initial accuracy: {:.2f}".format(accuracy0))
     print(H.history)
     traning_result = {
-      'log': H.history,
-      'model': path_model,
-      'name_model': self.name_model + "_mobilenet.h5",
-      'type':'mobiletnet'
+      "log": H.history,
+      "model": path_model,
+      "name_model": self.name_model + "_mobilenet.h5",
+      "type":"mobiletnet"
     }
+    with open("historys/" + self.name_model + "_mobilenet.txt", 'w') as f:
+      f.write(str(traning_result))
     return traning_result
 
   # Resnet50
@@ -128,11 +126,13 @@ class create_model:
     model.save(path_model)
     print(H.history)
     traning_result = {
-      'log': H.history,
-      'model': path_model,
-      'name_model': self.name_model + "_resnet50.h5",
-      'type':'resnet50'
+      "log": H.history,
+      "model": path_model,
+      "name_model": self.name_model + "_resnet50.h5",
+      "type":"resnet50"
     }
+    with open("historys/" + self.name_model + "_resnet50.txt", 'w') as f:
+      f.write(str(traning_result))
     return traning_result
 
   # Mobilenetv2
