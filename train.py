@@ -67,7 +67,7 @@ class create_model:
     output = Dense(units=self.num_classes, activation='softmax')(x)
     model = Model(inputs=base_model.input, outputs=output)
     model.summary()
-    for layer in model.layers[:-1]: # -23
+    for layer in model.layers[:-23]: # -23
         layer.trainable = False
 
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])

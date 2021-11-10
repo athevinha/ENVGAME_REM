@@ -68,6 +68,7 @@
           <div class="loading hide" style='height: 300px;
           overflow:overlay;
           border:1px violet solid;
+          text-align: left;
           color:lime;
           border-radius: 20px;'>
           </div>
@@ -184,7 +185,7 @@
       if(data.result != ''){
         response = data.result
         console.log(response)
-        $('.loading').hide(300)
+        // $('.loading').hide(300)
         $('.load_log').show(300)
         $('.result').show(300)
         if (response.name_model) {
