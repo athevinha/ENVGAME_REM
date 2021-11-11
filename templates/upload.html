@@ -181,17 +181,22 @@
     $.get("{{ url_for('static',filename='log/nohup.out') }}", function (data) {
       // data = data.replaceAll("'",'"')
       data = JSON.parse(data)
-      console.log(data)
+      // console.log(data)
       if(data.result != ''){
         response = data.result
-        console.log(response)
+        // console.log(response)
         // $('.loading').hide(300)
         $('.load_log').show(300)
-        $('.result').show(300)
-        if (response.name_model) {
+        // console.log(response.name_model + $("#name_model").val() + "_" + response.type + ".h5")
+        if (response.name_model == $("#name_model").val() + "_" + response.type + ".h5") {
+          console.log("show graph !")
           $('.result').show(300)
           $('#model_downloader').attr("href", "/download/" + response.name_model)
           draw_graph(response)
+        }
+        else{
+          console.log('hide graph')
+          $('.result').hide()
         }
       }
       $(".loading").html(processing_log(data.nohup))

@@ -84,7 +84,7 @@ class create_model:
       "log": H.history,
       "model": path_model,
       "name_model": self.name_model + "_mobilenet.h5",
-      "type":"mobiletnet"
+      "type":"mobilenet"
     }
     with open("historys/" + self.name_model + "_mobilenet.txt", 'w') as f:
       f.write(str(traning_result))
