@@ -29,7 +29,7 @@ def data_progress(data_dir):
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
     zip_ref.extractall("uploads/")
 def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_training):
-   try:
+   # try:
       model_created = train.create_model(
          data_dir = data_dir
          ,img_height =img_height
@@ -38,13 +38,24 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,name_model = name_model
          ,epoch = epoch
          ,model_training = model_training)
-      result = model_created.mobileNet()
-      return result
-   except:
-      print("====================")
-      print("Wrong directory structure")
-      print("====================")
-      return "<b style='color:red'>Wrong directory structure or System error </b>"
+      if model_training == "mobilenet":
+         result = model_created.envgame_leaf_disease_model()
+         return result
+      elif model_training == "resnet50":
+         result = model_created.resnet50()
+         return result
+      elif model_training == "envgame_leaf_disease":
+         # model_created.img_height = 256
+         # model_created.img_width = 256
+         result = model_created.envgame_leaf_disease()
+         return result
+      else:
+         return "result"
+   # except:
+   #    print("====================")
+   #    print("Wrong directory structure")
+   #    print("====================")
+   #    return "<b style='color:red'>Wrong directory structure or System error </b>"
       
 # ____ router flask ____
 

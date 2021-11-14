@@ -1,3 +1,4 @@
+from re import S
 from sys import path
 import tensorflow as tf
 from tensorflow.keras import layers
@@ -7,6 +8,12 @@ from keras.layers.core import Dense
 from keras.layers.core import Dropout
 from keras.layers.core import Flatten
 from tensorflow.keras.optimizers import RMSprop
+from keras.models import Sequential
+from keras.layers import BatchNormalization
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
+from keras.layers.core import Activation, Flatten, Dropout, Dense
+from keras import backend as K
 data_dir = "uploads/flowers"
 img_height = 224
 img_width = 224
@@ -137,15 +144,52 @@ class create_model:
 
   # Mobilenetv2
 
-  def mobileNetV2(self):
-    base_model = tf.keras.applications.mobilenet_v2.MobileNetV2(input_shape=(self.img_height, self.img_width, 3))
-    base_model.summary()
-    x = base_model.layers[-2].output
-    output = Dense(units=self.num_classes,activation="softmax")(x)
-    model = Model(inputs=base_model.input, outputs = output)
-    for layer in model.layers[:-23]:
-        layer.trainable = False
+  def envgame_leaf_disease(self):
+    # base_model = tf.keras.models.load_model('envgame.h5')
+    
+    # x = base_model.layers[-2].output
+    # output = Dense(units=self.num_classes,activation="softmax")(x)
+    # model = Model(inputs=base_model.input, outputs = output)
+    # for layer in model.layers[:-23]:
+    #     layer.trainable = False
+    model = Sequential()
+    inputShape = (self.img_height, self.img_width, 3)
+    chanDim = -1
 
+    if K.image_data_format() == "channels_first":
+        inputShape = (3, self.img_height, self.img_width)
+        chanDim = 1
+
+    model.add(Conv2D(32, (3, 3), padding="same",input_shape=inputShape))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization(axis=chanDim))
+    model.add(MaxPooling2D(pool_size=(3, 3)))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(64, (3, 3), padding="same"))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization(axis=chanDim))
+    model.add(Conv2D(64, (3, 3), padding="same"))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization(axis=chanDim))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(128, (3, 3), padding="same"))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization(axis=chanDim))
+    model.add(Conv2D(128, (3, 3), padding="same"))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization(axis=chanDim))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.25))
+    model.add(Flatten())
+    model.add(Dense(1024))
+    model.add(Activation("relu"))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.5))
+    model.add(Dense(self.num_classes))
+    model.add(Activation("softmax"))
+
+    model.summary()
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     
     H = model.fit(self.train_ds,
@@ -154,12 +198,14 @@ class create_model:
                 validation_steps=self.val_batches,
                 epochs=self.epoch,
     )
-    path_model = "models/"+ self.name_model + "_mobilenet.h5"
+    path_model = "models/"+ self.name_model + "_envgame_leaf_disease.h5"
     model.save(path_model)
     traning_result = {
       'log': H.history,
       'model': path_model,
-      'name_model': self.name_model + "_mobilenet.h5",
-      'type':'mobiletnet'
+      'name_model': self.name_model + "_envgame_leaf_disease.h5",
+      'type':'envgame_leaf_disease'
     }
+    with open("historys/" + self.name_model + "_envgame_leaf_disease.txt", 'w') as f:
+      f.write(str(traning_result))
     return traning_result
