@@ -12,7 +12,11 @@
     integrity="sha512-YWzhKL2whUzgiheMoBFwW8CKV4qpHQAEuvilg9FAn5VJUDwKZZxkJNuGM4XkWuk94WCrrwslk8yWNGmY1EduTA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
-
+<style>
+  label, .btn{
+    font-family: emoji;
+  }
+</style>
 <body>
   <div class="models hide"
     style="overflow: overlay;position:fixed;z-index: 30;height: 98vh;top:1vh; width: 20vw; background-color: rgb(0, 17, 51); left: 80vw; border-radius: 20px;border: 1px solid;">
@@ -51,19 +55,26 @@
               </div>
             </div>
           </div>
+          <hr />
+          <!-- <span class="text_model">Download everyone's model:</span> -->
+          <!-- <hr /> -->
+         
           <div class="upload-btn-wrapper">
             <label id="upload_widget" class="cloudinary-button" for="dataset_input" style="cursor: pointer;">
-              SUBMIT & UPLOAD DATASET HERE
+              SUBMIT & UPLOAD DATASET HERE <i class="fa fa-cloud-upload-alt"></i>
             </label>
             <input name="file" type="file" id="dataset_input">
           </div>
+          <hr />
+          <p class="btn btn-outline-primary toogle_models btn-block btn-large" style="cursor:pointer; font-size: 25px;">
+            LIST OF TRAINED MODELS <i class="fa fa-folder-open"></i></p>
           <hr />
           <!-- <i style="color: white">
             "To diagnose plant diseases most accurately, give
             photos of a symptomatic plant leaf (not mixed with anything
             what else)"
           </i> -->
-          <hr />
+          <!-- <hr /> -->
 
           <div class="loading hide" style='height: 300px;
           overflow:overlay;
@@ -76,15 +87,23 @@
           </div>
           <hr />
           <div class="result hide">
-            <canvas id="accuracy"></canvas>
-            <canvas id="loss"></canvas>
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-6">
+                  <canvas id="accuracy"></canvas>
+                </div>
+                <div class="col-sm-6">
+                  <canvas id="loss"></canvas>
+                </div>
+              </div>
+            </div>
 
 
             <a href="" id="model_downloader" class="btn btn-outline-info btn-block btn-large" id="submit_create_model"
               style="font-size: 20px;">DOWNLOAD MODEL <i class="fa fa-cloud-download-alt"></i></a>
             <hr />
 
-            <a href="" class="btn btn-outline-primary btn-block btn-large" style="font-size: 20px;">EVALUATE MODEL <i
+            <a href="https://colab.research.google.com/drive/1B-xnPOV87MIwvGWLPggJNTLLfxUw1OMA" class="btn btn-outline-primary btn-block btn-large" style="font-size: 20px;">EVALUATE MODEL <i
                 class="fa fa-percent"></i></a>
           </div>
 
@@ -135,8 +154,15 @@
             <hr />
             <span class="text_model">Batch size:</span>
             <hr />
-            <input type="number" name="batch_size" id="batch_size" placeholder="Batch size..." value="64"
-              class="form-control">
+            <!-- <input type="number" name="batch_size" id="batch_size" placeholder="Batch size..." value="32"
+              class="form-control"> -->
+              <select id="batch_size" class="form-control" name="batch_size">
+                <option value="16">16</option>
+                <option value="32" selected>32</option>
+                <option value="64">64</option>
+                <option value="128">128</option>
+                <!-- <option value="256" disabled>256</option> -->
+              </select>
           </div>
           <hr />
           <span class="text_model">Model Training:</span>
@@ -144,15 +170,10 @@
           <select id="model_training" class="form-control">
             <option value="resnet50">Resnet50</option>
             <option value="InceptionV3">InceptionV3</option>
-            <option value="mobilenetv2">Mobile Net V2</option>
+            <option value="mobiletnet">Mobile Net V2</option>
             <option value="mobiletnet">Mobilet Net</option>
             <option value="envgame_leaf_disease" selected>Envgame Leaf Disease Pre-Train Model</option>
           </select>
-          <hr />
-          <span class="text_model">Download everyone's model:</span>
-          <hr />
-          <p class="btn btn-outline-primary toogle_models btn-block btn-large" style="cursor:pointer; font-size: 25px;">
-            LIST TRANING MODEL</p>
           <hr />
         </div>
       </div>
@@ -300,13 +321,13 @@
   $(document).ready(function () {
     $('.hide').hide()
     $("#dataset_input").change(function (e) {
-      $('.loading').show(300)
+      $('.loading').show(200)
       var file = e.target.files[0];
       console.log(bytesToSize(file.size))
       let file_info_export =
         `File name: <b>${file.name}</b> <br/> Size: <b>${bytesToSize(file.size)}</b> <br/> Type: <b>${file.type}</b>`
       $('.file_info').html(file_info_export)
-      $('.file_info').show(300)
+      $('.file_info').show(200)
       var formData = new FormData();
       formData.append("file", file);
       var QueryOBJ = {
