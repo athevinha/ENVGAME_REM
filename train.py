@@ -107,8 +107,15 @@ class create_model:
     model = tf.keras.Sequential()
     model.add(base_model)
     model.add(Flatten())
-    model.add(Dense(1000,activation = 'relu'))
-    model.add(Dense(self.num_classes,activation = 'softmax'))
+    model.add(Dense(1024,activation=('relu'),input_dim=512))
+    model.add(Dense(512,activation=('relu'))) 
+    model.add(Dropout(.4))
+    model.add(Dense(256,activation=('relu'))) 
+    model.add(Dropout(.3))
+    model.add(Dense(128,activation=('relu')))
+    model.add(Dropout(.2))
+    model.add(Dense(self.num_classes,activation=('softmax')))
+
     print(model.summary())
     # base_model.summary()
     # x = base_model.layers[-2].output
@@ -117,6 +124,7 @@ class create_model:
 
     # for layer in model.layers[:-26]:
     #     layer.trainable = False
+    
     model.compile(optimizer=tf.keras.optimizers.Adam(),
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
@@ -145,51 +153,23 @@ class create_model:
   # Mobilenetv2
 
   def envgame_leaf_disease(self):
-    # base_model = tf.keras.models.load_model('envgame.h5')
+    base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3),include_top=False)
     
-    # x = base_model.layers[-2].output
-    # output = Dense(units=self.num_classes,activation="softmax")(x)
-    # model = Model(inputs=base_model.input, outputs = output)
-    # for layer in model.layers[:-23]:
-    #     layer.trainable = False
     model = Sequential()
-    inputShape = (self.img_height, self.img_width, 3)
-    chanDim = -1
-
-    if K.image_data_format() == "channels_first":
-        inputShape = (3, self.img_height, self.img_width)
-        chanDim = 1
-
-    model.add(Conv2D(32, (3, 3), padding="same",input_shape=inputShape))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization(axis=chanDim))
-    model.add(MaxPooling2D(pool_size=(3, 3)))
-    model.add(Dropout(0.5))
-    model.add(Conv2D(64, (3, 3), padding="same"))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization(axis=chanDim))
-    model.add(Conv2D(64, (3, 3), padding="same"))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization(axis=chanDim))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.5))
-    model.add(Conv2D(128, (3, 3), padding="same"))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization(axis=chanDim))
-    model.add(Conv2D(128, (3, 3), padding="same"))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization(axis=chanDim))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(1024))
-    model.add(Activation("relu"))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(self.num_classes))
-    model.add(Activation("softmax"))
-
+    model.add(base_model) 
+    model.add(Flatten()) 
+    # model.add(Dense(1024,activation=('relu'),input_dim=512))
+    # model.add(Dense(512,activation=('relu'))) 
+    model.add(Dense(256,activation=('relu'))) 
+    model.add(Dropout(.3))
+    model.add(Dense(128,activation=('relu')))
+    model.add(Dropout(.2))
+    model.add(Dense(self.num_classes,activation=('softmax')))
     model.summary()
+
+    for layer in model.layers[:-23]: # -23
+        layer.trainable = False
+    
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     
     H = model.fit(self.train_ds,
