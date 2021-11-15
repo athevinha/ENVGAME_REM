@@ -10,7 +10,7 @@ import zipfile
 import zipfile
 import logging
 import threading, queue,time
-
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 # ____ init ____
