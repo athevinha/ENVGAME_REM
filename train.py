@@ -14,11 +14,11 @@ from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 from keras.layers.core import Activation, Flatten, Dropout, Dense
 from keras import backend as K
-data_dir = "uploads/flowers"
-img_height = 224
-img_width = 224
-batch_size = 64
-name_model = "flowers"
+# data_dir = "uploads/flowers"
+# img_height = 224
+# img_width = 224
+# batch_size = 64
+# name_model = "flowers"
 
 class create_model:
   def __init__(self, data_dir, img_height,img_width,model_training,epoch = 5, name_model = "user",batch_size = 64):
@@ -68,7 +68,7 @@ class create_model:
 
   #Mobilenet
 
-  def mobileNet(self):
+  def mobileNet(self,type):
     base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3))
     x = base_model.layers[-6].output
     output = Dense(units=self.num_classes, activation='softmax')(x)
@@ -90,10 +90,10 @@ class create_model:
     traning_result = {
       "log": H.history,
       "model": path_model,
-      "name_model": self.name_model + "_mobilenet.h5",
-      "type":"mobilenet"
+      "name_model": self.name_model + "_"+ type + ".h5",
+      "type":type
     }
-    with open("historys/" + self.name_model + "_mobilenet.txt", 'w') as f:
+    with open("historys/" + self.name_model + "_" + type +".txt", 'w') as f:
       f.write(str(traning_result))
     return traning_result
 
@@ -137,7 +137,7 @@ class create_model:
                 validation_steps=self.val_batches,
                 epochs=self.epoch,
     )
-    path_model = "uploads/"+ name_model + "_resnet50.h5"
+    path_model = "uploads/"+ self.name_model + "_resnet50.h5"
     model.save(path_model)
     print(H.history)
     traning_result = {

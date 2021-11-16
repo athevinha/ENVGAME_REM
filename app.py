@@ -10,7 +10,7 @@ import zipfile
 import zipfile
 import logging
 import threading, queue,time
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 # ____ init ____
@@ -39,10 +39,13 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,epoch = epoch
          ,model_training = model_training)
       if model_training == "mobilenet":
-         result = model_created.mobileNet()
+         result = model_created.mobileNet('mobilenet')
          return result
       elif model_training == "resnet50":
          result = model_created.resnet50()
+         return result
+      elif model_training == "mobilenetv2":
+         result = model_created.mobileNet('mobilenetv2')
          return result
       elif model_training == "envgame_leaf_disease":
          # model_created.img_height = 256

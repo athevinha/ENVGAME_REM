@@ -22,6 +22,7 @@
     style="overflow: overlay;position:fixed;z-index: 30;height: 98vh;top:1vh; width: 20vw; background-color: rgb(0, 17, 51); left: 80vw; border-radius: 20px;border: 1px solid;">
     Loading...
   </div>
+  <hr/>
   <form method="POST" enctype="multipart/form-data" id="form_upload">
     <div class="container" style="max-width: 90vw;">
       <div class="row">
@@ -151,7 +152,7 @@
             <hr />
             <span class="text_model">Epoch:</span>
             <hr />
-            <input type="number" name="epoch" id="epoch" placeholder="Epoch..." value="5" class="form-control">
+            <input type="number" name="epoch" id="epoch" placeholder="Epoch..." value="10" class="form-control">
           </div>
           <div>
             <hr />
@@ -173,9 +174,9 @@
           <select id="model_training" class="form-control">
             <option value="resnet50">Resnet50</option>
             <option value="InceptionV3">InceptionV3</option>
-            <option value="mobiletnet">Mobile Net V2</option>
-            <option value="mobiletnet" selected>Mobilet Net</option>
-            <option value="envgame_leaf_disease">Envgame Leaf Disease Pre-Train Model</option>
+            <option value="mobilenetv2">Mobile Net V2</option>
+            <option value="mobilenet">Mobilet Net</option>
+            <option value="envgame_leaf_disease" selected>Envgame Leaf Disease Pre-Train Model</option>
           </select>
           <hr />
         </div>
