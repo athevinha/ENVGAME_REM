@@ -68,7 +68,7 @@ class create_model:
 
   #Mobilenet
 
-  def mobileNet(self,type):
+  def mobileNet(self):
     base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3))
     x = base_model.layers[-6].output
     output = Dense(units=self.num_classes, activation='softmax')(x)
@@ -85,16 +85,17 @@ class create_model:
                 validation_steps=self.val_batches,
                 epochs=self.epoch,
     )
+    type_model= "mobilenet"
     path_model = "models/"+ self.name_model + "_mobilenet.h5"
     model.save(path_model)
     print(H.history)
     traning_result = {
       "log": H.history,
       "model": path_model,
-      "name_model": self.name_model + "_"+ type + ".h5",
-      "type":type
+      "name_model": self.name_model + "_"+ type_model + ".h5",
+      "type":type_model
     }
-    with open("historys/" + self.name_model + "_" + type +".txt", 'w') as f:
+    with open("historys/" + self.name_model + "_" + type_model +".txt", 'w') as f:
       f.write(str(traning_result))
     return traning_result
 
