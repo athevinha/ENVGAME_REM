@@ -39,7 +39,7 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,epoch = epoch
          ,model_training = model_training)
       if model_training == "mobilenet":
-         result = model_created.mobileNet()
+         result = model_created.mobileNet('mobilenet')
          return result
       elif model_training == "resnet50":
          result = model_created.resnet50()
