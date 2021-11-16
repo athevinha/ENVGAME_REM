@@ -16,8 +16,8 @@ import threading, queue,time
 # ____ init ____
 q = queue.Queue()
 app = Flask(__name__)
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
 # ____ processing function ____
 
@@ -98,10 +98,14 @@ def index():
          if uploaded_file and allowed_file(uploaded_file.filename):
             path_save = "uploads/" + uploaded_file.filename
             uploaded_file.save(path_save)
+            print("================ SYSTEM LOG ========================")
+            print('GET FILE *.zip')
+            print("====================================================")
             data_progress(path_save)
             os.remove(path_save)
-            
-            
+            print("================ SYSTEM LOG ========================")
+            print('Extract oke !!! *.zip')
+            print("====================================================")
             task_info = {
                  'data_dir': path_save.replace(".zip","")
                ,'img_height' : data['img_height']
