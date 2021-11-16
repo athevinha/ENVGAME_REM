@@ -73,7 +73,8 @@ class create_model:
     x = base_model.layers[-6].output
     output = Dense(units=self.num_classes, activation='softmax')(x)
     model = Model(inputs=base_model.input, outputs=output)
-    model.summary()
+    print("============ TRAINING =============")
+    # model.summary()
     for layer in model.layers[:-23]: # -23
         layer.trainable = False
 
