@@ -310,7 +310,7 @@
               style="font-size: 20px;">${model} <i class="fa fa-cloud-download-alt"></i></a>`
         }))
       })
-  }
+  }  
 
   get_models()
 
@@ -319,8 +319,8 @@
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
-    if ((bytes / (1024 ** i)).toFixed(1) >= 50) {
-      console.log("Your dataset is over 50MB !")
+    if ((bytes / (1024 ** i)).toFixed(1) >= 100) {
+      console.log("Your dataset is over 100MB !")
       // return "<b style={color:'red'}>Your dataset is over 50MB !</b>"
     }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
