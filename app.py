@@ -48,8 +48,8 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          result = model_created.mobileNet('mobilenetv2')
          return result
       elif model_training == "envgame_leaf_disease":
-         # model_created.img_height = 256
-         # model_created.img_width = 256
+         # model_created.img_height = 224
+         # model_created.img_width = 224
          result = model_created.envgame_leaf_disease()
          return result
       else:
@@ -174,4 +174,4 @@ print('All work completed')
 # ____ system config ____
 
 if __name__ == '__main__':
-   app.run()
+   app.run(debug=True)

@@ -34,19 +34,19 @@ class create_model:
     self.epoch = int(epoch)
     print(self)
     self.train_ds = tf.keras.utils.image_dataset_from_directory(
-                    data_dir,
-                    seed=123,
-                    validation_split=0.2,
-                    image_size=(img_height, img_width),
-                    batch_size=batch_size,
-                    subset="training")
+                      data_dir,
+                      seed=123,
+                      validation_split=0.2,
+                      image_size=(img_height, img_width),
+                      batch_size=batch_size,
+                      subset="training")
     self.val_ds = tf.keras.utils.image_dataset_from_directory(
-                    data_dir,
-                    seed=123,
-                    subset="validation",
-                    validation_split=0.2,
-                    image_size=(img_height, img_width),
-                    batch_size=batch_size)
+                      data_dir,
+                      seed=123,
+                      subset="validation",
+                      validation_split=0.2,
+                      image_size=(img_height, img_width),
+                      batch_size=batch_size)         
     self.val_batches = tf.data.experimental.cardinality(self.val_ds)
     self.num_classes = len(self.train_ds.class_names)
     print(self.num_classes)
@@ -60,9 +60,9 @@ class create_model:
     self.val_ds = self.val_ds.prefetch(buffer_size=AUTOTUNE)
 
 
-    data_augmentation = tf.keras.Sequential([
-      tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
-      tf.keras.layers.experimental.preprocessing.RandomRotation(0.2),
+    self.data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomRotation(0.2),
     ])
 
   #Mobilenet
@@ -155,20 +155,31 @@ class create_model:
   # Mobilenetv2
 
   def envgame_leaf_disease(self):
-    base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3),include_top=False)
+    # base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3),include_top=False)
     
-    model = Sequential()
-    model.add(base_model) 
-    model.add(Flatten()) 
-    # model.add(Dense(1024,activation=('relu'),input_dim=512))
-    # model.add(Dense(512,activation=('relu'))) 
-    model.add(Dense(256,activation=('relu'))) 
-    model.add(Dropout(.3))
-    model.add(Dense(128,activation=('relu')))
-    model.add(Dropout(.2))
-    model.add(Dense(self.num_classes,activation=('softmax')))
-    model.summary()
+    # model = Sequential()
+    # model.add(base_model) 
+    # model.add(Flatten()) 
+    # # model.add(Dense(1024,activation=('relu'),input_dim=512))
+    # # model.add(Dense(512,activation=('relu'))) 
+    # model.add(Dense(256,activation=('relu'))) 
+    # model.add(Dropout(.3))
+    # model.add(Dense(128,activation=('relu')))
+    # model.add(Dropout(.2))
+    # model.add(Dense(self.num_classes,activation=('softmax')))
+    base_model = tf.keras.models.load_model('envgame.h5')
+    x = base_model.layers[-2].output
+    output_final = Dense(units=self.num_classes, activation='softmax')(x)
+    base_fake_model = Model(base_model.input, output_final)
 
+    print(self.img_height)
+    input_img = tf.keras.Input(batch_shape=(None,self.img_height,self.img_width,3))    # let us say this new InputLayer
+    ouput_img = base_fake_model(input_img)
+
+
+    model = Model(input_img, ouput_img)
+
+    model.summary()
     for layer in model.layers[:-23]: # -23
         layer.trainable = False
     
