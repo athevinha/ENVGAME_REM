@@ -179,7 +179,6 @@
     position: absolute;
     z-index: -1;
   }
-
   .form-control{
     background-color: rgb(0, 17, 51);
     border: 1px violet solid;

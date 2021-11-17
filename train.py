@@ -13,11 +13,10 @@ from keras.layers import BatchNormalization
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 from keras.layers.core import Activation, Flatten, Dropout, Dense
-# data_dir = "uploads/flowers"
 # img_height = 224
 # img_width = 224
 # batch_size = 64
-# name_model = "flowers"
+
 
 class create_model:
   def __init__(self, data_dir, img_height,img_width,model_training,epoch = 5, name_model = "user",batch_size = 64):
@@ -61,10 +60,15 @@ class create_model:
 
 
     self.data_augmentation = tf.keras.Sequential([
-        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.Rescaling(1./255),
         tf.keras.layers.experimental.preprocessing.RandomRotation(0.2),
+        tf.keras.layers.Discretization(bin_boundaries=[0., 1., 2.]),
+        tf.keras.layers.CenterCrop(self.img_height - 10, self.img_width-10 ),
+        tf.keras.layers.RandomZoom(.5, .2)
     ])
 
+    # self.train_ds = self.prepare(self.train_ds, shuffle=True, augment=True)
+    
   #Mobilenet
 
   def mobileNet(self,type_model):
@@ -93,7 +97,7 @@ class create_model:
       "log": H.history,
       "model": path_model,
       "name_model": self.name_model + "_"+ type_model + ".h5",
-      "type":type_model
+      "type":type_model,
     }
     with open("historys/" + self.name_model + "_" + type_model +".txt", 'w') as f:
       f.write(str(traning_result))
@@ -139,24 +143,66 @@ class create_model:
                 validation_steps=self.val_batches,
                 epochs=self.epoch,
     )
-    path_model = "uploads/"+ self.name_model + "_resnet50.h5"
+    path_model = "models/"+ self.name_model + "_resnet50.h5"
     model.save(path_model)
     print(H.history)
     traning_result = {
       "log": H.history,
       "model": path_model,
       "name_model": self.name_model + "_resnet50.h5",
-      "type":"resnet50"
+      "type":"resnet50",
     }
     with open("historys/" + self.name_model + "_resnet50.txt", 'w') as f:
       f.write(str(traning_result))
     return traning_result
 
-  # Mobilenetv2
+  # InceptionV3
+
+  def inceptionV3(self):
+    base_model = tf.keras.applications.inception_v3.InceptionV3(weights='imagenet', include_top=False)
+    x = base_model.output
+    x = tf.keras.layers.GlobalAveragePooling2D()(x)
+    x = Dense(4096, activation='relu')(x)
+    predictions = Dense(self.num_classes, activation='softmax')(x)
+    model = Model(inputs=base_model.input, outputs=predictions)
+
+
+    for layer in base_model.layers:
+        layer.trainable = False
+
+
+    # model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    
+    model.compile(optimizer=tf.keras.optimizers.Adam(),
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+
+    # model.compile(optimizer=tf.keras.optimizers.Adam(lr=0.0001), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    H = model.fit(self.train_ds,
+                steps_per_epoch=len(self.train_ds),
+                validation_data=self.val_ds,
+                validation_steps=self.val_batches,
+                epochs=self.epoch,
+    )
+    path_model = "models/"+ self.name_model + "_inceptionV3.h5"
+    model.save(path_model)
+    print(H.history)
+    traning_result = {
+      "log": H.history,
+      "model": path_model,
+      "name_model": self.name_model + "_inceptionV3.h5",
+      "type":"inceptionV3",
+    }
+    with open("historys/" + self.name_model + "_inceptionV3.txt", 'w') as f:
+      f.write(str(traning_result))
+    return traning_result
+
+
 
   def envgame_leaf_disease(self):
     # base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3),include_top=False)
-    
     # model = Sequential()
     # model.add(base_model) 
     # model.add(Flatten()) 
@@ -173,7 +219,7 @@ class create_model:
     base_fake_model = Model(base_model.input, output_final)
 
     print(self.img_height)
-    input_img = tf.keras.Input(batch_shape=(None,self.img_height,self.img_width,3))    # let us say this new InputLayer
+    input_img = tf.keras.Input(batch_shape=(None,self.img_height,self.img_width,3))
     ouput_img = base_fake_model(input_img)
 
 
@@ -197,7 +243,7 @@ class create_model:
       'log': H.history,
       'model': path_model,
       'name_model': self.name_model + "_envgame_leaf_disease.h5",
-      'type':'envgame_leaf_disease'
+      'type':'envgame_leaf_disease',
     }
     with open("historys/" + self.name_model + "_envgame_leaf_disease.txt", 'w') as f:
       f.write(str(traning_result))

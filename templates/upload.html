@@ -16,6 +16,9 @@
   label, .btn{
     font-family: emoji;
   }
+  body,html{
+    zoom: 97%;
+  }
 </style>
 <body>
   <div class="models hide"
@@ -168,12 +171,29 @@
                 <!-- <option value="256" disabled>256</option> -->
               </select>
           </div>
+          <div>
+            <hr />
+            <span class="text_model">Data augmentation:</span>
+            <hr />
+            <!-- <input type="number" name="batch_size" id="batch_size" placeholder="Batch size..." value="32"
+              class="form-control"> -->
+              <select id="data_augmentation" class="form-control" name="data_augmentation">
+                <option value="-1">None</option>
+                <option value="0" selected>Random flip + Normalization + RandomZoom + Random crop + Resizing</option>
+                <option value="1">Normalization</option>
+                <option value="2">Random zoom</option>
+                <option value="3">Random crop</option>
+                <option value="4">Resizing</option>
+
+                <!-- <option value="256" disabled>256</option> -->
+              </select>
+          </div>
           <hr />
           <span class="text_model">Model Training:</span>
           <hr />
           <select id="model_training" class="form-control">
-            <option value="resnet50">Resnet50</option>
-            <option value="InceptionV3">InceptionV3</option>
+            <option value="resnet50">Resnet50 (Do not recommend) Heavy</option>
+            <option value="inceptionV3">InceptionV3</option>
             <option value="mobilenetv2">Mobile Net V2</option>
             <option value="mobilenet">Mobile Net</option>
             <option value="envgame_leaf_disease" selected>Envgame Leaf Disease Pre-Train Model</option>
@@ -344,6 +364,7 @@
         epoch: $("#epoch").val(),
         batch_size: $("#batch_size").val(),
         model_training: $("#model_training").val(),
+        // data_augmentation: $("#model_training").val()
       }
 
       if (QueryOBJ.model_training == "envgame_leaf_disease") {

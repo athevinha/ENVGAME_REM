@@ -27,6 +27,7 @@
             <div class="col-sm-6">
                 Name model: <p class="name_model" style="color:coral;font-size: 25px;"></p>
                 Type: <p class="type_model" style="color:coral;font-size: 25px;"></p>
+                <!-- Data augmentation: <p class="data_augmentation" style="color:coral;font-size: 25px;"></p> -->
                 <a href="" id="model_downloader" class="btn btn-outline-info btn-block btn-large"
                 id="submit_create_model" style="font-size: 20px;">Download model <i
                     class="fa fa-cloud-download-alt"></i></a>
@@ -65,6 +66,7 @@
         $('#model_downloader').attr("href", "/download/" + history.name_model)
         $('.name_model').html(history.name_model)
         $('.type_model').html(history.type)
+        // $('.data_augmentation').html('keras.engine.sequential.Sequential object at 0x15ab34670')
         $('.accuracy_model').html(history.log.accuracy[history.log.accuracy.length - 1])
         $('.val_accuracy_model').html(history.log.val_accuracy[history.log.val_accuracy.length - 1])
         $('.loss_model').html(history.log.loss[history.log.loss.length - 1])

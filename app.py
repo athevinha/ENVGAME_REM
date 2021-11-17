@@ -12,13 +12,13 @@ import logging
 import threading, queue,time
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
 # ____ init ____
 q = queue.Queue()
 app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
+
 # ____ processing function ____
 
 def allowed_file(filename):
@@ -43,6 +43,8 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          return result
       elif model_training == "resnet50":
          result = model_created.resnet50()
+      elif model_training == "inceptionV3":
+         result = model_created.inceptionV3()
          return result
       elif model_training == "mobilenetv2":
          result = model_created.mobileNet('mobilenetv2')
@@ -83,10 +85,8 @@ def worker():
          print("====================================================")
          q.task_done()
 
-# turn-on the worker thread
 threading.Thread(target=worker, daemon=True).start()
 print('All task requests sent\n', end='')
-# block until all tasks are done
 
 @app.route("/",methods = ["GET","POST"])
 def index():
