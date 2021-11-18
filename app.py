@@ -69,7 +69,7 @@ def worker():
    while True:
          data = q.get()
          print("================ SYSTEM LOG ========================")
-         print(f'Working on {data["data_dir"]}')
+         print(f'WORK ON {data["name_model"]}')
          print("====================================================")
          result_gl = traning(
             data_dir= data['data_dir']
@@ -81,7 +81,7 @@ def worker():
                ,model_training = data['model_training']
             )
          print("================ SYSTEM LOG ========================")
-         print(f'Finished {data["data_dir"]}')
+         print(f'FINISHED {data["name_model"]}')
          print("====================================================")
          q.task_done()
 

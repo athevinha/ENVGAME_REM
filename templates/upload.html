@@ -54,7 +54,7 @@
               <div class="col-sm-6 border_none">
                 <hr />
                 <div class="file_info" style="color:tomato; ">
-                  The system automatically creates a deep learning model of trees using a dataset provided by the user.
+                  The system automatically creates a deep learning model of trees using a dataset provided by the user. <a href="https://tree-directory-envgame.netlify.app/" target="_blank" >tree-directory-envgame</a>
                 </div>
               </div>
             </div>
@@ -90,7 +90,8 @@
           color:lime;
           border-radius: 20px;'>
           </div>
-          <div class="load_log hide">
+          <div class="load_log hide" style="font-family: cursive; font-size: 30px;">
+            <i class="fas fa-spinner fa-spin"></i>
           </div>
           <hr />
           <div class="result hide">
@@ -216,7 +217,7 @@
 <script>
   //  let  dict = '{"log": {"loss": [1.6513383388519287], "accuracy": [0.4078007936477661], "val_loss": [1.7214546203613281], "val_accuracy": [0.4404181241989136]}, "model": "models/q\u01b0ev_mobilenet.h5", "name_model": "q\u01b0ev_mobilenet.h5", "type": "mobiletnet"}'
   //  let dict2 = "{'loss': [1.698645830154419, 0.9830909967422485, 0.7008122801780701, 0.5004916787147522, 0.3600955605506897], 'accuracy': [0.4071043133735657, 0.6409541964530945, 0.7797318696975708, 0.885948121547699, 0.9399268627166748], 'val_loss': [2.1421902179718018, 1.5581915378570557, 1.461743712425232, 1.316980004310608, 1.310359001159668], 'val_accuracy': [0.3846689760684967, 0.4648083746433258, 0.504529595375061, 0.5456445813179016, 0.5491289496421814]}"
-  let SERVER_ADS = 'https://create-model.envgame.online/'
+  let SERVER_ADS = 'http://127.0.0.1:5000/'
   // http://127.0.0.1:5000/
   // https://create-model.envgame.online/
  // ?????
@@ -237,13 +238,13 @@
         response = data.result
         // console.log(response)
         // $('.loading').hide(300)
-        $('.load_log').show(200)
+        // $('.load_log').show(200)
         // console.log(response.name_model + $("#name_model").val() + "_" + response.type + ".h5")
         if (response.name_model == $("#name_model").val() + "_" + response.type + ".h5") {
           console.log("show graph !")
-          $('.loading').hide(100)
+          $('.loading').hide(50)
           $('.result').show(200)
-          $('.load_log').hide(200)
+          $('.load_log').hide()
           $('#model_downloader').attr("href", "/download/" + response.name_model)
           draw_graph(response)
         } else {
@@ -339,8 +340,8 @@
     if (bytes === 0) return 'n/a'
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10)
     if (i === 0) return `${bytes} ${sizes[i]})`
-    if ((bytes / (1024 ** i)).toFixed(1) >= 100) {
-      console.log("Your dataset is over 100MB !")
+    if ((bytes / (1024 ** i)).toFixed(1) >= 200) {
+      console.log("Your dataset is over 200MB !")
       // return "<b style={color:'red'}>Your dataset is over 50MB !</b>"
     }
     return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`
@@ -349,6 +350,7 @@
     $('.hide').hide()
     $("#dataset_input").change(function (e) {
       $('.loading').show(200)
+      $('.load_log').show(200)
       var file = e.target.files[0];
       console.log(bytesToSize(file.size))
       let file_info_export =
