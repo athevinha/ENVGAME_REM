@@ -15,8 +15,8 @@ import threading, queue,time
 # ____ init ____
 q = queue.Queue()
 app = Flask(__name__)
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+# log = logging.getLogger('werkzeug')
+# log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
 
 # ____ processing function ____
@@ -68,9 +68,9 @@ def worker():
    global result_gl
    while True:
          data = q.get()
-         print("================ SYSTEM LOG ========================")
+         print("<br/>================ SYSTEM LOG ========================")
          print(f'WORK ON {data["name_model"]}')
-         print("====================================================")
+         print("====================================================<br/>")
          result_gl = traning(
             data_dir= data['data_dir']
                ,img_height = data['img_height']
@@ -80,9 +80,9 @@ def worker():
                ,name_model= data['name_model']
                ,model_training = data['model_training']
             )
-         print("================ SYSTEM LOG ========================")
+         print("<br/>================ SYSTEM LOG ========================")
          print(f'FINISHED {data["name_model"]}')
-         print("====================================================")
+         print("====================================================<br/>")
          q.task_done()
 
 threading.Thread(target=worker, daemon=True).start()
@@ -98,14 +98,15 @@ def index():
          if uploaded_file and allowed_file(uploaded_file.filename):
             path_save = "uploads/" + uploaded_file.filename
             uploaded_file.save(path_save)
-            print("================ SYSTEM LOG ========================")
-            print('GET FILE *.zip')
-            print("====================================================")
+            # print("================ SYSTEM LOG ========================")
+            # print('GET FILE *.zip')
+            # print("====================================================")
             data_progress(path_save)
             os.remove(path_save)
-            print("================ SYSTEM LOG ========================")
+            print("<br/>================ SYSTEM LOG ========================")
             print('Extract oke !!! *.zip')
-            print("====================================================")
+            print('Your model is in queue !!! *.zip')
+            print("==================================================== <br/>")
             task_info = {
                  'data_dir': path_save.replace(".zip","")
                ,'img_height' : data['img_height']
