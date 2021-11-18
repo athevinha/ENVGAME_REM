@@ -15,8 +15,8 @@ import threading, queue,time
 # ____ init ____
 q = queue.Queue()
 app = Flask(__name__)
-# log = logging.getLogger('werkzeug')
-# log.setLevel(logging.ERROR)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
 
 # ____ processing function ____
