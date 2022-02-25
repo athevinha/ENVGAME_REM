@@ -10,7 +10,7 @@ import zipfile
 import zipfile
 import logging
 import threading, queue,time
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+import urllib.request
 
 # ____ init ____
 q = queue.Queue()
@@ -20,10 +20,29 @@ log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip'}
 
 # ____ processing function ____
-
+def zipdir(path, ziph):
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            ziph.write(os.path.join(root, file), 
+                       os.path.relpath(os.path.join(root, file), 
+                                       os.path.join(path, '..')))
+      
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def folder_structure(startpath):
+   structure = ''
+   for root, dirs, files in os.walk(startpath):
+        level = root.replace(startpath, '').count(os.sep)
+        indent = ' ' * 4 * (level)
+        structure+= '<br/>{}{}/    '.format(indent, os.path.basename(root))
+      #   print()
+        subindent = ' ' * 4 * (level + 1)
+        for f in files:
+            structure+= '<br/>&emsp;&emsp;{}{}'.format(subindent, f)
+            # print('{}{}'.format(subindent, f))
+   return structure
 
 def data_progress(data_dir):
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
@@ -167,7 +186,50 @@ def historys(history_model):
          return render_template("history.html", history = rs)
    except:
       return render_template("error.html", name = history_model) 
-   
+
+
+@app.route('/downloadDataFes/<name_folder>', methods=['GET', 'POST'])
+def downloadDataFes(name_folder):
+   zipf = zipfile.ZipFile('zip/'+ name_folder+'.zip', 'w', zipfile.ZIP_DEFLATED)
+   zipdir('uploads/fes/'+ name_folder +"/", zipf)
+   zipf.close()
+   return send_file('zip/'+ name_folder+'.zip', as_attachment=True)
+
+@app.route('/showDatasStructureFes/<name_folder>', methods=['GET', 'POST'])
+def showDatasFes(name_folder):
+   results = folder_structure('uploads/fes/'+ name_folder)
+   return results
+
+@app.route('/showLeafDataFes/<name_folder>', methods=['GET', 'POST'])
+def showLeafDataFes(name_folder):
+   dir = 'static/' + name_folder
+   roots = []
+   for root, dirs, files in os.walk(dir):
+      roots.append(root)
+   classes = roots[random.randint(0, len(roots) - 1)]
+   files = os.listdir(classes)
+   name = files[random.randint(0, len(files) - 1)]
+   url = classes +'/'+ name
+   return json.dumps({ 
+      'url':url,
+      'classes':classes.replace('static/' +name_folder+'/',''),
+      'name': name
+   })
+
+@app.route('/pushDataFes/', methods=['GET', 'POST'])
+def pushLeafDataFes():
+   url = request.args.get('url')
+   classes= request.args.get('classes')
+   name = request.args.get('name')
+   urllib.request.urlretrieve(url, "uploads/fes/exampleData/"+ classes + "/" + name)
+   return json.dumps({ 
+      'url':url,
+      'classes':classes.replace('static/addData/',''),
+      'name': name
+   }) 
+
+   # return send_file("static/"+name_folder, as_attachment=True)
+
 
 q.join()
 print('All work completed')
