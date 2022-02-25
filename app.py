@@ -228,6 +228,7 @@ def pushLeafDataFes():
    url = request.args.get('url')
    classes= request.args.get('classes')
    name = request.args.get('name')
+   url = url.replace(" ", "%20")
    urllib.request.urlretrieve(url, "uploads/fes/exampleData/"+ classes + "/" + name)
    return json.dumps({ 
       'url':url,
