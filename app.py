@@ -192,6 +192,7 @@ def historys(history_model):
 
 
 @app.route('/downloadDataFes/<name_folder>', methods=['GET', 'POST'])
+@cross_origin()
 def downloadDataFes(name_folder):
    zipf = zipfile.ZipFile('zip/'+ name_folder+'.zip', 'w', zipfile.ZIP_DEFLATED)
    zipdir('uploads/fes/'+ name_folder +"/", zipf)
@@ -199,11 +200,13 @@ def downloadDataFes(name_folder):
    return send_file('zip/'+ name_folder+'.zip', as_attachment=True)
 
 @app.route('/showDatasStructureFes/<name_folder>', methods=['GET', 'POST'])
+@cross_origin()
 def showDatasFes(name_folder):
    results = folder_structure('uploads/fes/'+ name_folder)
    return results
 
 @app.route('/showLeafDataFes/<name_folder>', methods=['GET', 'POST'])
+@cross_origin()
 def showLeafDataFes(name_folder):
    dir = 'static/' + name_folder
    roots = []
@@ -220,6 +223,7 @@ def showLeafDataFes(name_folder):
    })
 
 @app.route('/pushDataFes/', methods=['GET', 'POST'])
+@cross_origin()
 def pushLeafDataFes():
    url = request.args.get('url')
    classes= request.args.get('classes')
