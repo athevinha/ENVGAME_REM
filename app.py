@@ -11,9 +11,12 @@ import zipfile
 import logging
 import threading, queue,time
 import urllib.request
-
+from flask_cors import CORS, cross_origin
+app = Flask(__name__)
 # ____ init ____
 q = queue.Queue()
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
