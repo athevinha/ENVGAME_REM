@@ -25,6 +25,7 @@ ALLOWED_EXTENSIONS = {'zip'}
 # ____ processing function ____
 def zipdir(path, ziph):
     for root, dirs, files in os.walk(path):
+      #  print(dirs)
         for file in files:
             ziph.write(os.path.join(root, file), 
                        os.path.relpath(os.path.join(root, file), 
@@ -33,19 +34,18 @@ def zipdir(path, ziph):
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+def filter_space(string):
+   return ' '.join(string.split())
 
 def folder_structure(startpath):
-   structure = ''
+   structure_dist = {"data":[]}
    for root, dirs, files in os.walk(startpath):
-        level = root.replace(startpath, '').count(os.sep)
-        indent = ' ' * 4 * (level)
-        structure+= '<br/>{}{}/    '.format(indent, os.path.basename(root))
-      #   print()
-        subindent = ' ' * 4 * (level + 1)
-        for f in files:
-            structure+= '<br/>&emsp;&emsp;{}{}'.format(subindent, f)
-            # print('{}{}'.format(subindent, f))
-   return structure
+      files.sort()
+      structure_dist['data'].append({
+         "classes": root,
+         "files": files
+      })
+   return json.dumps(structure_dist)
 
 def data_progress(data_dir):
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
@@ -176,7 +176,6 @@ def nohup():
 
 @app.route('/download/<name_model>', methods=['GET', 'POST'])
 def download(name_model):
-   print(name_model)
    return send_file("models/"+name_model, as_attachment=True)
 
 @app.route('/historys/<history_model>', methods=['GET', 'POST'])
@@ -185,6 +184,7 @@ def historys(history_model):
       with open('historys/'+ history_model + ".txt") as f:
          lines = f.read()
          lines = lines.replace("'", '"')
+
          rs = json.loads(lines)
          return render_template("history.html", history = rs)
    except:
@@ -194,34 +194,46 @@ def historys(history_model):
 @app.route('/downloadDataFes/<name_folder>', methods=['GET', 'POST'])
 @cross_origin()
 def downloadDataFes(name_folder):
+   print('dơnload...')
    zipf = zipfile.ZipFile('zip/'+ name_folder+'.zip', 'w', zipfile.ZIP_DEFLATED)
-   zipdir('uploads/fes/'+ name_folder +"/", zipf)
+   zipdir('static/'+ name_folder +"/", zipf)
    zipf.close()
    return send_file('zip/'+ name_folder+'.zip', as_attachment=True)
+
+@app.route('/getAllClasses/<name_folder>', methods=['GET', 'POST'])
+@cross_origin()
+def getAllClasses(name_folder):
+   dir = 'static/' + name_folder
+   classesd = os.listdir(dir)
+   return json.dumps({ 
+      'classes': classesd,
+   })
 
 @app.route('/showDatasStructureFes/<name_folder>', methods=['GET', 'POST'])
 @cross_origin()
 def showDatasFes(name_folder):
-   results = folder_structure('uploads/fes/'+ name_folder)
+   results = folder_structure('static/'+ name_folder + "/")
    return results
+
+
+dir = 'static/addData'
+roots = []
+for root, dirs, files in os.walk(dir):
+   if root != dir:
+      roots.append(root)
 
 @app.route('/showLeafDataFes/<name_folder>', methods=['GET', 'POST'])
 @cross_origin()
 def showLeafDataFes(name_folder):
-   dir = 'static/' + name_folder
-   roots = []
-   for root, dirs, files in os.walk(dir):
-      roots.append(root)
    classes = roots[random.randint(0, len(roots) - 1)]
    files = os.listdir(classes)
    name = files[random.randint(0, len(files) - 1)]
-   url = classes +'/'+ name
+   url = '/' + classes +'/'+ name
    return json.dumps({ 
       'url':url,
-      'classes':classes.replace('static/' +name_folder+'/',''),
+      'classes':classes.replace('static/' + name_folder+'/',''),
       'name': name
    })
-
 @app.route('/pushDataFes/', methods=['GET', 'POST'])
 @cross_origin()
 def pushLeafDataFes():
@@ -229,7 +241,10 @@ def pushLeafDataFes():
    classes= request.args.get('classes')
    name = request.args.get('name')
    url = url.replace(" ", "%20")
-   urllib.request.urlretrieve(url, "uploads/fes/exampleData/"+ classes + "/" + name)
+   opener = urllib.request.build_opener()
+   opener.addheaders = [('User-Agent', 'MyApp/1.0')]
+   urllib.request.install_opener(opener)
+   urllib.request.urlretrieve(url, "static/exampleData/"+ classes + "/" + name)
    return json.dumps({ 
       'url':url,
       'classes':classes.replace('static/addData/',''),
