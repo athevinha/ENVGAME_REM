@@ -45,7 +45,8 @@ class create_model:
                       subset="validation",
                       validation_split=0.2,
                       image_size=(img_height, img_width),
-                      batch_size=batch_size)         
+                      batch_size=batch_size)
+
     self.val_batches = tf.data.experimental.cardinality(self.val_ds)
     self.num_classes = len(self.train_ds.class_names)
     print(self.num_classes)
@@ -90,6 +91,7 @@ class create_model:
                 epochs=self.epoch,
     )
     # type_model= "mobilenet"
+    test_loss, test_acc = model.evaluate(self.test_ds, verbose=2)
     path_model = "models/"+ self.name_model + "_mobilenet.h5"
     model.save(path_model)
     print(H.history)

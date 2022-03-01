@@ -111,6 +111,7 @@ threading.Thread(target=worker, daemon=True).start()
 print('All task requests sent\n', end='')
 
 @app.route("/",methods = ["GET","POST"])
+@cross_origin()
 def index():
    if(request.method=="POST"):
       try:
@@ -190,11 +191,27 @@ def historys(history_model):
    except:
       return render_template("error.html", name = history_model) 
 
-
+@app.route('/getHistoryFES/<history_model>', methods=['GET', 'POST'])
+@cross_origin()
+def getHistoryFES(history_model):
+   try:
+      with open('historys/'+ history_model + ".txt") as f:
+         lines = f.read()
+         lines = lines.replace("'", '"')
+         rs = json.loads(lines)
+         return json.dumps({
+            "history":rs,
+            "status": 200,
+            })
+   except:
+      return {
+         "error": "You need download your dataset and training by this system!",
+         "status":404,
+         }
+      
 @app.route('/downloadDataFes/<name_folder>', methods=['GET', 'POST'])
 @cross_origin()
 def downloadDataFes(name_folder):
-   print('dơnload...')
    zipf = zipfile.ZipFile('zip/'+ name_folder+'.zip', 'w', zipfile.ZIP_DEFLATED)
    zipdir('static/'+ name_folder +"/", zipf)
    zipf.close()
