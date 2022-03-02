@@ -281,7 +281,7 @@ def pushImageFES():
          # uploaded_file = uploaded_file.resize((256,256))
          print(uploaded_file)
          if uploaded_file and allowed_file(uploaded_file.filename):
-            path_save = "static/exampleData/"+ classes + "/00___USER_DATA___00123" + uploaded_file.filename
+            path_save = "static/exampleData/"+ classes + "/00___USER_DATA___00_" + uploaded_file.filename
             uploaded_file.save(path_save)
          return "Push image '"+ uploaded_file.filename + "' to '" + classes +"' success!"
       except Exception as e :
