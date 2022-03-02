@@ -11,7 +11,6 @@ import zipfile
 import logging
 import threading, queue,time
 import urllib.request
-from PIL import Image
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 # ____ init ____
