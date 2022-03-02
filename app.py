@@ -11,6 +11,7 @@ import zipfile
 import logging
 import threading, queue,time
 import urllib.request
+from PIL import Image
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 # ____ init ____
@@ -20,7 +21,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-ALLOWED_EXTENSIONS = {'zip'}
+ALLOWED_EXTENSIONS = {'zip','png','jpg'}
 
 # ____ processing function ____
 def zipdir(path, ziph):
@@ -267,6 +268,29 @@ def pushLeafDataFes():
       'classes':classes.replace('static/addData/',''),
       'name': name
    }) 
+
+
+@app.route("/pushImageFES",methods = ["GET","POST"])
+@cross_origin()
+def pushImageFES():
+   if(request.method=="POST"):
+      try:
+         classes = request.form.get("classes")
+         print(classes)
+         # data = json.loads(data)
+         uploaded_file = request.files['file']
+         # uploaded_file = uploaded_file.resize((256,256))
+         print(uploaded_file)
+         if uploaded_file and allowed_file(uploaded_file.filename):
+            path_save = "static/exampleData/"+ classes + "/00___USER_DATA___00123" + uploaded_file.filename
+            uploaded_file.save(path_save)
+         return "Push image '"+ uploaded_file.filename + "' to '" + classes +"' success!"
+      except Exception as e :
+         print(e)
+         return "error"
+   if(request.method=="GET"):
+      return render_template("upload.html")
+
 
    # return send_file("static/"+name_folder, as_attachment=True)
 
