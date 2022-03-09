@@ -21,7 +21,7 @@ app = Flask(__name__)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip','png','jpg'}
-
+zip_files = 0
 # ____ processing function ____
 def zipdir(path, ziph):
     for root, dirs, files in os.walk(path):
@@ -48,8 +48,12 @@ def folder_structure(startpath):
    return json.dumps(structure_dist)
 
 def data_progress(data_dir):
+   global zip_files
+   zip_files = os.path.getsize(data_dir) / 10000000
+   print('app trainend',zip_files)
    with zipfile.ZipFile(data_dir, 'r') as zip_ref:
     zip_ref.extractall("uploads/")
+
 def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_training):
    # try:
       model_created = train.create_model(
@@ -59,7 +63,9 @@ def traning(data_dir,img_height,img_width,batch_size,name_model,epoch,model_trai
          ,batch_size = batch_size
          ,name_model = name_model
          ,epoch = epoch
-         ,model_training = model_training)
+         ,model_training = model_training
+         ,zip_files = zip_files
+         )
       if model_training == "mobilenet":
          result = model_created.mobileNet('mobilenet')
          return result
