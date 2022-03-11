@@ -299,6 +299,9 @@ def pushImageFES():
 
    # return send_file("static/"+name_folder, as_attachment=True)
 
+@app.route('/modelDesign')
+def modelDesign():
+   return render_template('modelDesign.html')
 
 q.join()
 print('All work completed')

@@ -272,9 +272,6 @@ class create_model:
 
 
 
-
-
-
   # def mobileNet(self,type_model):
   #   base_model = tf.keras.applications.mobilenet.MobileNet(input_shape=(self.img_height, self.img_width, 3))
   #   base_model.summary()
