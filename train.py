@@ -237,7 +237,7 @@ class create_model:
     for layer in model.layers: # -23
         layer.trainable = True
        
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(), loss='categorical_crossentropy', metrics=['accuracy'])
     H = model.fit(self.train_ds,
                 steps_per_epoch=len(self.train_ds),
                 validation_data=self.val_ds,
