@@ -2,6 +2,7 @@ from flask import Flask,flash, render_template,make_response,send_file,jsonify, 
 from flask.wrappers import Request
 from werkzeug.utils import secure_filename
 import train as train
+import designModel as designModel
 import os
 import json
 import tensorflow as tf
@@ -14,10 +15,12 @@ import urllib.request
 from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 # ____ init ____
+designModel.design(256,256,3)
 q = queue.Queue()
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
+app.register_blueprint(designModel.designModel)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip','png','jpg'}
