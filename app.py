@@ -304,10 +304,9 @@ def pushImageFES():
    # return send_file("static/"+name_folder, as_attachment=True)
 @app.route('/cleanLog',methods = ["GET","POST"])
 def cleanLog():
-   # print('---asda')
-   # s = input("")
+   print('---asda')
+   s = input("")
    f = open("/static/log/nohup.out", "r+")
-   print(f)
    # f.truncate(0)
    # f.write(s)
    # f.close()
@@ -324,4 +323,4 @@ print('All work completed')
 # ____ system config ____
 
 if __name__ == '__main__':
-   app.run(port=5000,debug=True)
+   app.run(host='0.0.0.0',port=5000,debug=True)
