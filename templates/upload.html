@@ -24,7 +24,7 @@
   }
 </style>
 
-<body>
+<body onload="cleanLog()">
   <div class="models hide"
     style="overflow: overlay;position:fixed;z-index: 30;height: 98vh;top:1vh; width: 20vw; background-color: rgb(0, 17, 51); left: 95vw; border-radius: 20px;border: 1px solid;">
     Loading...
@@ -231,6 +231,12 @@
   window.postMessage({
     data: "asfasf"
   }, "*")
+
+  function cleanLog() {
+    axios.get(SERVER_ADS + 'cleanLog').then(() => {
+      console.log('--- Clean log ---')
+    })
+  }
 
   function processing_log(data) {
     data = data.replaceAll('"GET /static/styles/nohup.out HTTP/1.0" 200 -', '<br/>')

@@ -304,13 +304,10 @@ def pushImageFES():
    # return send_file("static/"+name_folder, as_attachment=True)
 @app.route('/cleanLog',methods = ["GET","POST"])
 def cleanLog():
-   print('---asda')
-   s = input("")
-   f = open("/static/log/nohup.out", "r+")
-   # f.truncate(0)
-   # f.write(s)
-   # f.close()
-   return '...'
+   print('--- CLEAN LOG ---')
+   f = open("static/log/nohup.out", "r+")
+   f.truncate(0)
+   return f.read()
 
 @app.route('/modelDesign')
 def modelDesign():
