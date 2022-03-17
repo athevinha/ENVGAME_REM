@@ -24,7 +24,7 @@
   }
 </style>
 
-<body onload="cleanLog()">
+<body>
   <div class="models hide"
     style="overflow: overlay;position:fixed;z-index: 30;height: 98vh;top:1vh; width: 20vw; background-color: rgb(0, 17, 51); left: 95vw; border-radius: 20px;border: 1px solid;">
     Loading...
@@ -96,9 +96,14 @@
           color:lime;
           border-radius: 20px;'>
           </div>
-          <div class="load_log hide" style="font-family: cursive; font-size: 30px;">
-            <i class="fas fa-spinner fa-spin"></i>
-          </div>
+          <p onclick="cleanLog()" class="btn btn-outline-danger btn-block btn-large"
+            style="cursor:pointer; font-size: 25px;">
+            CLEAN LOG <i class="fas fa-trash-alt"></i>
+            <div class="load_log hide" style="font-family: cursive; font-size: 30px;">
+              <i class="fas fa-spinner fa-spin"></i>
+            </div>
+          </p>
+
           <hr />
           <div class="result hide">
             <div class="container">
