@@ -309,7 +309,7 @@ def pushImageFES():
 
 
 def data_augmentation_random_brightness(image,label = "ok",seed=(1,0)):
-  aug_image = tf.image.adjust_brightness(image, delta = random.uniform(0.5,0.6))
+  aug_image = tf.image.adjust_brightness(image, delta = random.uniform(0.8,0.9))
   return aug_image
 
 def data_augmentation_random_contrast(image,label = "ok",seed=(2,0)):
@@ -347,10 +347,10 @@ def augDataFes():
       if aug == 'r':
          im = data_augmentation_random_rotation(image = im)
    tf.keras.utils.save_img(path , im, data_format=None, file_format=None, scale=True)
-   print(im)
    return json.dumps({ 
-      'img':str(im),
+      # 'img':str(im),
       'classes':classes.replace('static/addData/',''),
+      "path":path,
       'name': name
    })
 
