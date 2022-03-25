@@ -12,7 +12,6 @@ from PIL import Image
 import logging
 import numpy as np
 import threading, queue,time
-import matplotlib.pyplot as plt
 import urllib.request
 from flask_cors import CORS, cross_origin
 
