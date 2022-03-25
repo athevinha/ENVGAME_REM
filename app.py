@@ -323,7 +323,7 @@ def data_augmentation_random_gamma(image,label = "ok",seed=(2,0)):
 def data_augmentation_random_rotation(image,label = "ok",central_fraction=(0.5)):
   data_augmentation = tf.keras.Sequential([
   tf.keras.layers.RandomFlip("horizontal_and_vertical"),
-  tf.keras.layers.RandomRotation(0.2)])
+  tf.keras.layers.RandomRotation(0.1)])
   aug_image = data_augmentation(image)
 #   aug_image = tf.image.resize(image, [256,256])
   return aug_image
@@ -333,7 +333,11 @@ def data_augmentation_random_rotation(image,label = "ok",central_fraction=(0.5))
 def augDataFes():
    name = request.args.get('name')
    classes= request.args.get('classes')
-   augs = request.args.get('aug').split(',')
+   link_aug_image = 'http://localhost:5000/static/exampleData/'+ classes+'/'+ name
+   try:
+      augs = request.args.get('aug').split(',')
+   except:
+      return render_template('fes_image.html',data = link_aug_image.replace(' ',"%20"))
    path = "static/exampleData/" + classes + "/" + name
    im = Image.open(path)
    for aug in augs:
@@ -347,12 +351,14 @@ def augDataFes():
       if aug == 'r':
          im = data_augmentation_random_rotation(image = im)
    tf.keras.utils.save_img(path , im, data_format=None, file_format=None, scale=True)
-   return json.dumps({ 
-      # 'img':str(im),
-      'classes':classes.replace('static/addData/',''),
+
+   data = json.dumps({ 
+      'classes':classes,
       "path":path,
       'name': name
    })
+   print(data)
+   return render_template('fes_image.html',data = link_aug_image.replace(' ',"%20"))
 
    # return send_file("static/"+name_folder, as_attachment=True)
 @app.route('/cleanLog',methods = ["GET","POST"])
