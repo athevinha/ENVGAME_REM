@@ -333,7 +333,7 @@ def data_augmentation_random_rotation(image,label = "ok",central_fraction=(0.5))
 def augDataFes():
    name = request.args.get('name')
    classes= request.args.get('classes')
-   link_aug_image = 'http://localhost:5000/static/exampleData/'+ classes+'/'+ name
+   link_aug_image = 'http://create-model.envgame.online/static/exampleData/'+ classes+'/'+ name
    try:
       augs = request.args.get('aug').split(',')
    except:
