@@ -1,31 +1,34 @@
+from re import I
 from flask import Flask,flash, render_template,make_response,send_file,jsonify, request, redirect, url_for,Response, stream_with_context
 from flask.wrappers import Request
 from werkzeug.utils import secure_filename
 import train as train
-import designModel as designModel
 import os
 import json
 import tensorflow as tf
 import random
 import zipfile
-import zipfile
+from PIL import Image
 import logging
+import numpy as np
 import threading, queue,time
+import matplotlib.pyplot as plt
 import urllib.request
 from flask_cors import CORS, cross_origin
+
+
 app = Flask(__name__)
-# ____ init ____
-designModel.design(256,256,3)
 q = queue.Queue()
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
-app.register_blueprint(designModel.designModel)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 ALLOWED_EXTENSIONS = {'zip','png','jpg'}
 zip_files = 0
-# ____ processing function ____
+
+
+
 def zipdir(path, ziph):
     for root, dirs, files in os.walk(path):
       #  print(dirs)
@@ -38,12 +41,15 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 def filter_space(string):
+   # print(string)
    return ' '.join(string.split())
 
 def folder_structure(startpath):
    structure_dist = {"data":[]}
    for root, dirs, files in os.walk(startpath):
       files.sort()
+      # print(dirs)
+      # print(files)
       structure_dist['data'].append({
          "classes": root,
          "files": files
@@ -214,8 +220,9 @@ def getHistoryFES(history_model):
             "status": 200,
             })
    except:
+      # print('download')
       return {
-         "error": "You need download your dataset and training by this system!",
+         "error": "error",
          "status":404,
          }
       
@@ -261,6 +268,7 @@ def showLeafDataFes(name_folder):
       'classes':classes.replace('static/' + name_folder+'/',''),
       'name': name
    })
+
 @app.route('/pushDataFes/', methods=['GET', 'POST'])
 @cross_origin()
 def pushLeafDataFes():
@@ -301,6 +309,52 @@ def pushImageFES():
       return render_template("upload.html")
 
 
+def data_augmentation_random_brightness(image,label = "ok",seed=(1,0)):
+  aug_image = tf.image.adjust_brightness(image, delta = random.uniform(0.5,0.6))
+  return aug_image
+
+def data_augmentation_random_contrast(image,label = "ok",seed=(2,0)):
+  aug_image = tf.image.adjust_contrast(image, random.uniform(0.95,1))
+  return aug_image
+
+def data_augmentation_random_gamma(image,label = "ok",seed=(2,0)):
+  aug_image = tf.image.adjust_gamma(image, random.uniform(0.5,0.7))
+  return aug_image
+
+def data_augmentation_random_rotation(image,label = "ok",central_fraction=(0.5)):
+  data_augmentation = tf.keras.Sequential([
+  tf.keras.layers.RandomFlip("horizontal_and_vertical"),
+  tf.keras.layers.RandomRotation(0.2)])
+  aug_image = data_augmentation(image)
+#   aug_image = tf.image.resize(image, [256,256])
+  return aug_image
+
+@app.route('/augDataFes/', methods=['GET', 'POST'])
+@cross_origin()
+def augDataFes():
+   name = request.args.get('name')
+   classes= request.args.get('classes')
+   augs = request.args.get('aug').split(',')
+   path = "static/exampleData/" + classes + "/" + name
+   im = Image.open(path)
+   for aug in augs:
+      im = tf.keras.preprocessing.image.img_to_array(im)
+      if aug =='g':
+         im = data_augmentation_random_gamma(image = im)
+      if aug == 'b':
+         im = data_augmentation_random_brightness(image = im)
+      if aug == 'c':
+         im = data_augmentation_random_contrast(image = im)
+      if aug == 'r':
+         im = data_augmentation_random_rotation(image = im)
+   tf.keras.utils.save_img(path , im, data_format=None, file_format=None, scale=True)
+   print(im)
+   return json.dumps({ 
+      'img':str(im),
+      'classes':classes.replace('static/addData/',''),
+      'name': name
+   })
+
    # return send_file("static/"+name_folder, as_attachment=True)
 @app.route('/cleanLog',methods = ["GET","POST"])
 def cleanLog():
@@ -308,10 +362,6 @@ def cleanLog():
    f = open("static/log/nohup.out", "r+")
    f.truncate(0)
    return f.read()
-
-@app.route('/modelDesign')
-def modelDesign():
-   return render_template('modelDesign.html')
 
 
 q.join()
